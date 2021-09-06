@@ -46,7 +46,7 @@ func main() {
 
 	// declare the match rules for different services requested
 	grpcFilter := tcpm.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
-	httpFilter := tcpm.Match(cmux.HTTP1Fast())
+	httpFilter := tcpm.Match(cmux.Any())
 
 	// initialize the servers by passing in the custom listeners
 	go grpcServer(grpcFilter)
