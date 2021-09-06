@@ -18,9 +18,9 @@ const PORT = 8080
 func grpcServer(listener net.Listener) {
 	s := grpc.NewServer()
 	fb.RegisterFileBrowserRpcServiceServer(s, &rpc.Server{})
-	if err := s.Serve(listener); err != nil {
-		log.Fatalf("Unable to start grpc server: %v", err)
-	}
+
+	err := s.Serve(listener)
+	utils.ExitIfError("Unable to start grpc server: %v", err)
 }
 
 func httpServer(listener net.Listener) {
@@ -29,17 +29,14 @@ func httpServer(listener net.Listener) {
 		fmt.Fprintf(w, "Hello, world!")
 	})
 
-	if err := http.Serve(listener, nil); err != nil {
-		log.Fatalf("Unable to start http server: %v", err)
-	}
+	err := http.Serve(listener, nil)
+	utils.ExitIfError("Unable to start http server: %v", err)
 }
 
 func main() {
 	// create a listener at the desired port
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", PORT))
-	if err != nil {
-		utils.ExitIfError(fmt.Sprintf("Unable to listen to port :%d", PORT), err)
-	}
+	utils.ExitIfError(fmt.Sprintf("Unable to listen to port :%d", PORT), err)
 
 	// close the listener when done
 	defer listener.Close()
