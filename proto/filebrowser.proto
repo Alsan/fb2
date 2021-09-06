@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+option go_package = "github.com/filebrowser/filebrowser/v2/proto";
+
+service FileBrowserRpcService {
+  rpc Login(LoginRequest) returns (LoginReply) {};
+  rpc FileList(FileListRequest) returns (FileListReply) {};
+  rpc UploadFile(UploadFileRequest) returns (UploadFileReply) {};
+  rpc DownloadFile(DownloadFileRequest) returns (DownloadFileReply);
+}
+
+// reusable messages
+enum ReplyStatus {
+  Unknown = 0;
+  Ok = 1;
+  Failed = 2;
+}
+
+message List { repeated string item = 1; }
+
+// login request and response
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginReply {
+  ReplyStatus status = 1;
+
+  oneof data {
+    string message = 2;
+    string token = 3;
+  }
+}
+
+// file list request and response
+message FileListRequest {
+  string token = 1;
+  string path = 2;
+  optional string filter = 3;
+}
+
+message FileListReply {
+  ReplyStatus status = 1;
+  oneof data {
+    string message = 2;
+    List list = 3;
+  }
+}
+
+// upload file request and response
+message UploadFileRequest {
+  string token = 1;
+  string path = 2;
+  string filename = 3;
+  bytes content = 4;
+}
+
+message UploadFileReply {
+  ReplyStatus status = 1;
+  optional string message = 2;
+}
+
+// download file request and response
+message DownloadFileRequest {
+  string token = 1;
+  string path = 2;
+}
+
+message DownloadFileReply {
+  ReplyStatus status = 1;
+
+  oneof data {
+    string message = 2;
+    bytes content = 3;
+  }
+}
