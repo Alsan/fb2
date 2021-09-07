@@ -14,6 +14,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/alsan/filebrowser/common"
 	fb "github.com/alsan/filebrowser/proto"
 	"github.com/alsan/filebrowser/server/auth"
 	"github.com/alsan/filebrowser/server/diskcache"
@@ -24,8 +25,6 @@ import (
 	"github.com/alsan/filebrowser/server/settings"
 	"github.com/alsan/filebrowser/server/storage"
 	"github.com/alsan/filebrowser/server/users"
-	"github.com/alsan/filebrowser/utils"
-	u "github.com/alsan/filebrowser/utils"
 	"github.com/mitchellh/go-homedir"
 	"github.com/soheilhy/cmux"
 	"github.com/spf13/afero"
@@ -81,7 +80,7 @@ func grpcServer(listener net.Listener) {
 	fb.RegisterFileBrowserRpcServiceServer(s, &rpc.Server{})
 
 	err := s.Serve(listener)
-	u.ExitIfError("Unable to start grpc server: %v", err)
+	common.ExitIfError("Unable to start grpc server: %v", err)
 }
 
 func setupDb(cmd *cobra.Command, d pythonData) {
@@ -92,7 +91,7 @@ func setupDb(cmd *cobra.Command, d pythonData) {
 
 func httpServer(listener net.Listener, handler http.Handler) {
 	err := http.Serve(listener, handler)
-	u.ExitIfError("Unable to start http server: %v", err)
+	common.ExitIfError("Unable to start http server: %v", err)
 }
 
 func getImgSvc(cmd *cobra.Command) *img.Service {
@@ -122,7 +121,7 @@ func getFileCache(cmd *cobra.Command) diskcache.Interface {
 
 func getAssetsFs() fs.FS {
 	assetsFs, err := fs.Sub(frontend.Assets(), "dist")
-	utils.ExitIfError("Unable to get assets directory", err)
+	common.ExitIfError("Unable to get assets directory", err)
 
 	return assetsFs
 }
@@ -440,7 +439,7 @@ func quickSetup(flags *pflag.FlagSet, d pythonData) {
 	password := getParam(flags, "password")
 
 	if password == "" {
-		password = utils.Md5Pass("admin")
+		password = common.Md5Pass("admin")
 	}
 
 	if username == "" || password == "" {

@@ -3,9 +3,9 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/alsan/filebrowser/common"
 	"github.com/alsan/filebrowser/server/settings"
 	"github.com/alsan/filebrowser/server/users"
-	"github.com/alsan/filebrowser/utils"
 )
 
 func init() {
@@ -65,7 +65,7 @@ options you want to change.`,
 		}
 
 		if password != "" {
-			user.Password = utils.Md5Pass(password)
+			user.Password = common.Md5Pass(password)
 		}
 
 		err = d.store.Users.Update(user)

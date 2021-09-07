@@ -3,8 +3,8 @@ module github.com/alsan/filebrowser/client
 go 1.17
 
 require (
+	github.com/alsan/filebrowser/common v0.0.0
 	github.com/alsan/filebrowser/proto v0.0.0
-	github.com/alsan/filebrowser/utils v0.0.0
 )
 
 require (
@@ -29,4 +29,4 @@ require (
 
 replace github.com/alsan/filebrowser/proto v0.0.0 => ../proto
 
-replace github.com/alsan/filebrowser/utils v0.0.0 => ../utils
+replace github.com/alsan/filebrowser/common v0.0.0 => ../common

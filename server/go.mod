@@ -5,8 +5,8 @@ go 1.17
 require (
 	github.com/DataDog/zstd v1.4.8 // indirect
 	github.com/Sereal/Sereal v0.0.0-20210713121911-8c71d8dbe594 // indirect
+	github.com/alsan/filebrowser/common v0.0.0
 	github.com/alsan/filebrowser/proto v0.0.0
-	github.com/alsan/filebrowser/utils v0.0.0
 	github.com/asdine/storm v2.1.2+incompatible
 	github.com/caddyserver/caddy v1.0.3
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -79,4 +79,4 @@ require (
 
 replace github.com/alsan/filebrowser/proto v0.0.0 => ../proto
 
-replace github.com/alsan/filebrowser/utils v0.0.0 => ../utils
+replace github.com/alsan/filebrowser/common v0.0.0 => ../common

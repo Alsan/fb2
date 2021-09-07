@@ -1,8 +1,8 @@
 package cmd
 
-import "github.com/alsan/filebrowser/utils"
+import "github.com/alsan/filebrowser/common"
 
 func Execute() {
 	err := rootCmd.Execute()
-	utils.ExitIfError("Unable to execute root command, %v", err)
+	common.ExitIfError("Unable to execute root command, %v", err)
 }

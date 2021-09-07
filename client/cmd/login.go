@@ -6,9 +6,9 @@ import (
 	"log"
 	"time"
 
-	clientUtils "github.com/alsan/filebrowser/client/utils"
+	"github.com/alsan/filebrowser/client/utils"
+	"github.com/alsan/filebrowser/common"
 	fb "github.com/alsan/filebrowser/proto"
-	utils "github.com/alsan/filebrowser/utils"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
@@ -18,8 +18,8 @@ func init() {
 }
 
 func getServer() string {
-	server, err := clientUtils.GetUserInput("Server (localhost:8080)")
-	utils.CheckErr(err)
+	server, err := utils.GetUserInput("Server (localhost:8080)")
+	common.CheckErr(err)
 
 	if server == "" {
 		server = "localhost:8080"
@@ -29,22 +29,22 @@ func getServer() string {
 }
 
 func getUsername() string {
-	username, err := clientUtils.GetUserInput("Username")
-	utils.CheckErr(err)
+	username, err := utils.GetUserInput("Username")
+	common.CheckErr(err)
 
 	return username
 }
 
 func getPassword() string {
-	password, err := clientUtils.GetUserPasswordInput()
-	utils.CheckErr(err)
+	password, err := utils.GetUserPasswordInput()
+	common.CheckErr(err)
 
 	return password
 }
 
 func doLogin(server string, username string, password string) *fb.LoginReply {
 	conn, err := grpc.Dial(server, grpc.WithInsecure(), grpc.WithBlock())
-	utils.ExitIfError("Unable to connect to server, %v", err)
+	common.ExitIfError("Unable to connect to server, %v", err)
 	defer conn.Close()
 	client := fb.NewFileBrowserRpcServiceClient(conn)
 
@@ -55,7 +55,7 @@ func doLogin(server string, username string, password string) *fb.LoginReply {
 		Username: username,
 		Password: password,
 	})
-	utils.ExitIfError("Unable to login, %v", err)
+	common.ExitIfError("Unable to login, %v", err)
 
 	return reply
 }
@@ -69,7 +69,7 @@ var loginCmd = &cobra.Command{
 		server := getServer()
 		username := getUsername()
 		password := getPassword()
-		md5Password := utils.Md5Pass(password)
+		md5Password := common.Md5Pass(password)
 
 		fmt.Printf("md5Password: %s\n", md5Password)
 
