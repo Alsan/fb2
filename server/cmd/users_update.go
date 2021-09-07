@@ -5,6 +5,7 @@ import (
 
 	"github.com/alsan/filebrowser/server/settings"
 	"github.com/alsan/filebrowser/server/users"
+	"github.com/alsan/filebrowser/utils"
 )
 
 func init() {
@@ -64,7 +65,7 @@ options you want to change.`,
 		}
 
 		if password != "" {
-			user.Password = users.Md5Pass(password)
+			user.Password = utils.Md5Pass(password)
 		}
 
 		err = d.store.Users.Update(user)

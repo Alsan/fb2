@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/alsan/filebrowser/server/users"
+	"github.com/alsan/filebrowser/utils"
 )
 
 func init() {
@@ -21,7 +22,7 @@ var usersAddCmd = &cobra.Command{
 		checkErr(err)
 		getUserDefaults(cmd.Flags(), &s.Defaults, false)
 
-		password := users.Md5Pass(args[1])
+		password := utils.Md5Pass(args[1])
 
 		user := &users.User{
 			Username:     args[0],

@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/alsan/filebrowser/server/users"
+	"github.com/alsan/filebrowser/utils"
 )
 
 func init() {
@@ -18,7 +18,7 @@ var hashCmd = &cobra.Command{
 	Long:  `Hashes a password using bcrypt algorithm.`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		pwd := users.Md5Pass(args[0])
+		pwd := utils.Md5Pass(args[0])
 
 		fmt.Println(pwd)
 	},
