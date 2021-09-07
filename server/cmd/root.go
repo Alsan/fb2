@@ -86,31 +86,6 @@ func httpServer(listener net.Listener) {
 	u.ExitIfError("Unable to start http server: %v", err)
 }
 
-func setupServer() {
-	// create a listener at the desired port
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", PORT))
-	u.ExitIfError(fmt.Sprintf("Unable to listen to port :%d", PORT), err)
-
-	// close the listener when done
-	defer listener.Close()
-
-	// create a cmux object
-	tcpm := cmux.New(listener)
-
-	// declare the match rules for different services requested
-	grpcFilter := tcpm.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
-	httpFilter := tcpm.Match(cmux.Any())
-
-	// initialize the servers by passing in the custom listeners
-	go grpcServer(grpcFilter)
-	go httpServer(httpFilter)
-
-	log.Printf("server listenering on port :%d", PORT)
-	if err := tcpm.Serve(); err != nil {
-		log.Fatalf("Error serving cmux: %v", err)
-	}
-}
-
 var rootCmd = &cobra.Command{
 	Use:   "filebrowser",
 	Short: "A stylish web-based file browser",
@@ -150,7 +125,28 @@ Also, if the database path doesn't exist, File Browser will enter into
 the quick setup mode and a new database will be bootstraped and a new
 user created with the credentials from options "username" and "password".`,
 	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
-		setupServer()
+		// create a listener at the desired port
+		listener, err := net.Listen("tcp", fmt.Sprintf(":%d", PORT))
+		u.ExitIfError(fmt.Sprintf("Unable to listen to port :%d", PORT), err)
+
+		// close the listener when done
+		defer listener.Close()
+
+		// create a cmux object
+		tcpm := cmux.New(listener)
+
+		// declare the match rules for different services requested
+		grpcFilter := tcpm.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
+		httpFilter := tcpm.Match(cmux.Any())
+
+		// initialize the servers by passing in the custom listeners
+		go grpcServer(grpcFilter)
+		go httpServer(httpFilter)
+
+		log.Printf("server listenering on port :%d", PORT)
+		if err := tcpm.Serve(); err != nil {
+			log.Fatalf("Error serving cmux: %v", err)
+		}
 	}, pythonConfig{allowNoDB: true}),
 }
 
