@@ -44,12 +44,12 @@ build: | build-frontend build-backend ; $(info $(M) building…)
 ## build-frontend: Build frontend
 .PHONY: build-frontend
 build-frontend: | ; $(info $(M) building frontend…)
-	$Q cd frontend && npm ci && npm run build
+	$Q cd frontend && pnpm run build
 
 ## build-backend: Build backend
 .PHONY: build-backend
 build-backend: | ; $(info $(M) building backend…)
-	$Q $(GO) build -ldflags '$(LDFLAGS)' -o .
+	$Q $(GO) build -ldflags '$(LDFLAGS)' -o $(BIN)/filebrowser
 
 ## test: Run all tests
 .PHONY: test
