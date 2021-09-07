@@ -63,6 +63,11 @@ build-frontend: | ; $(info $(M) building frontend…)
 build-backend: | ; $(info $(M) building backend…)
 	$Q $(GO) build -ldflags '$(LDFLAGS)' -o $(BIN)/filebrowser
 
+## run: Run the application with default configuration
+.PHONY: run
+run:
+	$Q $(BIN)/filebrowser
+
 ## test: Run all tests
 .PHONY: test
 test: | test-frontend test-backend ; $(info $(M) running tests…)
