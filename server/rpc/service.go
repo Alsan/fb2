@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	fb "github.com/filebrowser/filebrowser/proto"
+	fb "github.com/alsan/filebrowser/proto"
 )
 
 type Server struct {

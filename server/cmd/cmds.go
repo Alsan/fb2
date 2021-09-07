@@ -12,8 +12,8 @@ func init() {
 
 var cmdsCmd = &cobra.Command{
 	Use:   "cmds",
-	Short: "Command runner management utilities",
-	Long:  `Command runner management utilities`,
+	Short: "Command runner management utility",
+	Long:  `Command runner management utility.`,
 	Args:  cobra.NoArgs,
 }
 

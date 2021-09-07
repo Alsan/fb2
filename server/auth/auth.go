@@ -3,7 +3,7 @@ package auth
 import (
 	"net/http"
 
-	"github.com/filebrowser/filebrowser/server/users"
+	"github.com/alsan/filebrowser/server/users"
 )
 
 // Auther is the authentication interface.

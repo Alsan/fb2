@@ -5,7 +5,7 @@ import (
 
 	"github.com/caddyserver/caddy"
 
-	"github.com/filebrowser/filebrowser/server/settings"
+	"github.com/alsan/filebrowser/server/settings"
 )
 
 // ParseCommand parses the command taking in account if the current

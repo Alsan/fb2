@@ -1,4 +1,4 @@
-module github.com/filebrowser/filebrowser/proto
+module github.com/alsan/filebrowser/proto
 
 go 1.17
 

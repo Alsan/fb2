@@ -48,7 +48,7 @@ import {
   logoURL,
   recaptcha,
   recaptchaKey,
-  signup
+  signup,
 } from "@/utils/constants";
 
 export default {
@@ -56,7 +56,7 @@ export default {
   computed: {
     signup: () => signup,
     name: () => name,
-    logoURL: () => logoURL
+    logoURL: () => logoURL,
   },
   data: function () {
     return {
@@ -65,7 +65,7 @@ export default {
       username: "",
       password: "",
       recaptcha: recaptcha,
-      passwordConfirm: ""
+      passwordConfirm: "",
     };
   },
   mounted() {
@@ -73,7 +73,7 @@ export default {
 
     window.grecaptcha.ready(function () {
       window.grecaptcha.render("recaptcha", {
-        sitekey: recaptchaKey
+        sitekey: recaptchaKey,
       });
     });
   },
@@ -124,7 +124,7 @@ export default {
           this.error = this.$t("login.wrongCredentials");
         }
       }
-    }
-  }
+    },
+  },
 };
 </script>

@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/filebrowser/filebrowser/server/settings"
-	"github.com/filebrowser/filebrowser/server/users"
+	"github.com/alsan/filebrowser/server/settings"
+	"github.com/alsan/filebrowser/server/users"
 )
 
 // Runner is a commands runner.

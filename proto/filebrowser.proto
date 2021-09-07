@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/filebrowser/filebrowser/server/proto";
+option go_package = "github.com/alsan/filebrowser/server/proto";
 
 service FileBrowserRpcService {
   rpc Login(LoginRequest) returns (LoginReply) {};

@@ -39,7 +39,7 @@ export async function validateLogin() {
       await renew(localStorage.getItem("jwt"));
     }
   } catch (_) {
-    console.warn("Invalid JWT token in storage"); // eslint-disable-line
+    console.warn('Invalid JWT token in storage') // eslint-disable-line
   }
 }
 
@@ -49,9 +49,9 @@ export async function login(username, password, recaptcha) {
   const res = await fetch(`${baseURL}/api/login`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
 
   const body = await res.text();
@@ -67,8 +67,8 @@ export async function renew(jwt) {
   const res = await fetch(`${baseURL}/api/renew`, {
     method: "POST",
     headers: {
-      "X-Auth": jwt
-    }
+      "X-Auth": jwt,
+    },
   });
 
   const body = await res.text();
@@ -86,9 +86,9 @@ export async function signup(username, password) {
   const res = await fetch(`${baseURL}/api/signup`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
 
   if (res.status !== 200) {

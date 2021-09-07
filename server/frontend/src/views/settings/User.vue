@@ -67,13 +67,13 @@ export default {
   name: "user",
   components: {
     UserForm,
-    Errors
+    Errors,
   },
   data: () => {
     return {
       error: null,
       originalUser: null,
-      user: {}
+      user: {},
     };
   },
   created() {
@@ -83,14 +83,14 @@ export default {
     isNew() {
       return this.$route.path === "/settings/users/new";
     },
-    ...mapState(["loading"])
+    ...mapState(["loading"]),
   },
   watch: {
     $route: "fetchData",
     "user.perm.admin": function () {
       if (!this.user.perm.admin) return;
       this.user.lockPassword = false;
-    }
+    },
   },
   methods: {
     ...mapMutations(["closeHovers", "showHover", "setUser", "setLoading"]),
@@ -106,7 +106,7 @@ export default {
             password: "",
             rules: [],
             lockPassword: false,
-            id: 0
+            id: 0,
           };
         } else {
           const id = this.$route.params.pathMatch;
@@ -161,7 +161,7 @@ export default {
       } catch (e) {
         this.$showError(e);
       }
-    }
-  }
+    },
+  },
 };
 </script>

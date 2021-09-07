@@ -11,8 +11,8 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
 
-	"github.com/filebrowser/filebrowser/server/errors"
-	"github.com/filebrowser/filebrowser/server/users"
+	"github.com/alsan/filebrowser/server/errors"
+	"github.com/alsan/filebrowser/server/users"
 )
 
 const (

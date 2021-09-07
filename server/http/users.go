@@ -10,8 +10,8 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/filebrowser/filebrowser/server/errors"
-	"github.com/filebrowser/filebrowser/server/users"
+	"github.com/alsan/filebrowser/server/errors"
+	"github.com/alsan/filebrowser/server/users"
 )
 
 var (

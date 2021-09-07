@@ -10,8 +10,8 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/filebrowser/filebrowser/server/files"
-	"github.com/filebrowser/filebrowser/server/img"
+	"github.com/alsan/filebrowser/server/files"
+	"github.com/alsan/filebrowser/server/img"
 )
 
 /*

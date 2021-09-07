@@ -4,8 +4,8 @@ import (
 	"github.com/asdine/storm"
 	"github.com/asdine/storm/q"
 
-	"github.com/filebrowser/filebrowser/server/errors"
-	"github.com/filebrowser/filebrowser/server/share"
+	"github.com/alsan/filebrowser/server/errors"
+	"github.com/alsan/filebrowser/server/share"
 )
 
 type shareBackend struct {

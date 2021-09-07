@@ -3,7 +3,7 @@ package main
 import (
 	"runtime"
 
-	"github.com/filebrowser/filebrowser/server/cmd"
+	"github.com/alsan/filebrowser/server/cmd"
 )
 
 func main() {

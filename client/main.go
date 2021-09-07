@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	fb "github.com/filebrowser/filebrowser/proto"
-	"github.com/filebrowser/filebrowser/utils"
+	fb "github.com/alsan/filebrowser/proto"
+	"github.com/alsan/filebrowser/utils"
 
 	"google.golang.org/grpc"
 )

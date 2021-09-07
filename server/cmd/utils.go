@@ -14,9 +14,9 @@ import (
 	"github.com/spf13/pflag"
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/filebrowser/filebrowser/server/settings"
-	"github.com/filebrowser/filebrowser/server/storage"
-	"github.com/filebrowser/filebrowser/server/storage/bolt"
+	"github.com/alsan/filebrowser/server/settings"
+	"github.com/alsan/filebrowser/server/storage"
+	"github.com/alsan/filebrowser/server/storage/bolt"
 )
 
 func checkErr(err error) {
