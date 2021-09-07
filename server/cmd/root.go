@@ -1,8 +1,8 @@
 package cmd
 
 import (
+	"crypto/tls"
 	"errors"
-	"fmt"
 	"io/fs"
 	"io/ioutil"
 	"log"
@@ -144,15 +144,53 @@ func captureOsSignalNotification(listener net.Listener) {
 	go cleanupHandler(listener, sigc)
 }
 
-func getListener(serverConf *settings.Server, addr string) net.Listener {
-	listener, err := net.Listen("tcp", addr)
-	u.ExitIfError(fmt.Sprintf("Unable to listen to port :%s", addr), err)
+func getSocketLister(cmd *cobra.Command, serverConf *settings.Server) net.Listener {
+	listener, err := net.Listen("unix", serverConf.Socket)
+	checkErr(err)
+
+	socketPerm, err := cmd.Flags().GetUint32("socket-perm") //nolint:govet
+	checkErr(err)
+
+	err = os.Chmod(serverConf.Socket, os.FileMode(socketPerm))
+	checkErr(err)
 
 	return listener
 }
 
+func getTlsListener(serverConf *settings.Server, addr string) net.Listener {
+	cer, err := tls.LoadX509KeyPair(serverConf.TLSCert, serverConf.TLSKey) //nolint:govet
+	checkErr(err)
+
+	listener, err := tls.Listen("tcp", addr, &tls.Config{
+		MinVersion:   tls.VersionTLS12,
+		Certificates: []tls.Certificate{cer}},
+	)
+	checkErr(err)
+
+	return listener
+}
+
+func getHttpListener(addr string) net.Listener {
+	listener, err := net.Listen("tcp", addr)
+	checkErr(err)
+
+	return listener
+}
+
+func getListener(cmd *cobra.Command, serverConf *settings.Server, addr string) net.Listener {
+	if serverConf.Socket != "" {
+		return getSocketLister(cmd, serverConf)
+	}
+
+	if serverConf.TLSKey != "" && serverConf.TLSCert != "" {
+		return getTlsListener(serverConf, addr)
+	}
+
+	return getHttpListener(addr)
+}
+
 func setupServer(cmd *cobra.Command, d pythonData, serverConf *settings.Server, addr string) {
-	listener := getListener(serverConf, addr)
+	listener := getListener(cmd, serverConf, addr)
 
 	captureOsSignalNotification(listener)
 	defer listener.Close()
