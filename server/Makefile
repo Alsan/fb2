@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 BASE_PATH := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 VERSION ?= $(shell git describe --tags --always --match=v* 2> /dev/null || \
-           			cat $(CURDIR)/.version 2> /dev/null || echo v0)
+					 			cat $(CURDIR)/.version 2> /dev/null || echo v0)
 VERSION_HASH = $(shell git rev-parse HEAD)
 
 BIN = $(BASE_PATH)/bin
@@ -36,6 +36,18 @@ $(BIN)/golangci-lint: PACKAGE=github.com/golangci/golangci-lint/cmd/golangci-lin
 
 GOIMPORTS = $(BIN)/goimports
 $(BIN)/goimports: PACKAGE=golang.org/x/tools/cmd/goimports@v0.1.5
+
+all: update clean build
+
+## update: Update dependencies
+.PHONY: update
+update:
+	$Q go mod tidy
+
+## clean: Clean build output
+.PHONY: clean
+clean:
+	$Q rm $(BIN)/*
 
 ## build: Build
 .PHONY: build

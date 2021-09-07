@@ -37,7 +37,10 @@ $(BIN)/golangci-lint: PACKAGE=github.com/golangci/golangci-lint/cmd/golangci-lin
 GOIMPORTS = $(BIN)/goimports
 $(BIN)/goimports: PACKAGE=golang.org/x/tools/cmd/goimports@v0.1.5
 
-all: clean build
+all: update clean build
+
+update:
+	go mod tidy
 
 clean:
 	rm $(BIN)/*
