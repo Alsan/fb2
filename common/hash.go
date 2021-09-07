@@ -2,11 +2,12 @@ package common
 
 import (
 	"crypto/md5"
-	"encoding/hex"
 	"strings"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
-func Reverse(str string) string {
+func Reverse(str string) []byte {
 	n := len(str)
 	runes := make([]rune, n)
 
@@ -15,13 +16,13 @@ func Reverse(str string) string {
 		runes[n] = rune
 	}
 
-	return string(runes[n:])
+	return []byte(string(runes[n:]))
 }
 
-func Md5sum(password string) string {
-	hash := md5.Sum([]byte(password))
+func Md5sum(password []byte) []byte {
+	hash := md5.Sum(password)
 
-	return hex.EncodeToString(hash[:])
+	return hash[:]
 }
 
 // Md5Pass calculate password hash
@@ -29,8 +30,16 @@ func Md5sum(password string) string {
 // 2. split the reverse password into array
 // 3. join the array with comma as a string, ie: n,i,m,d,a
 // 4. calculate md5 checksum of the result string
-func Md5Pass(password string) string {
-	s := strings.Join(strings.Split(Reverse(password), ""), ",")
+func Md5Pass(password string) []byte {
+	r := string(Reverse(password))
+	s := strings.Join(strings.Split(r, ""), ",")
 
-	return Md5sum(s)
+	return Md5sum([]byte(s))
+}
+
+func BcryptHash(password []byte) []byte {
+	bytes, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
+	CheckErr(err)
+
+	return bytes
 }

@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -39,7 +38,7 @@ func getPassword() string {
 	password, err := utils.GetUserPasswordInput()
 	common.CheckErr(err)
 
-	return password
+	return string(common.BcryptHash(common.Md5Pass(password)))
 }
 
 func doLogin(server string, username string, password string) *fb.LoginReply {
@@ -69,9 +68,6 @@ var loginCmd = &cobra.Command{
 		server := getServer()
 		username := getUsername()
 		password := getPassword()
-		md5Password := common.Md5Pass(password)
-
-		fmt.Printf("md5Password: %s\n", md5Password)
 
 		reply := doLogin(server, username, password)
 

@@ -65,7 +65,7 @@ options you want to change.`,
 		}
 
 		if password != "" {
-			user.Password = common.Md5Pass(password)
+			user.Password = string(common.Md5Pass(password))
 		}
 
 		err = d.store.Users.Update(user)

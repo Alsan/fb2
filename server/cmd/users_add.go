@@ -22,7 +22,7 @@ var usersAddCmd = &cobra.Command{
 		checkErr(err)
 		getUserDefaults(cmd.Flags(), &s.Defaults, false)
 
-		password := common.Md5Pass(args[1])
+		password := string(common.Md5Pass(args[1]))
 
 		user := &users.User{
 			Username:     args[0],

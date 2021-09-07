@@ -439,7 +439,7 @@ func quickSetup(flags *pflag.FlagSet, d pythonData) {
 	password := getParam(flags, "password")
 
 	if password == "" {
-		password = common.Md5Pass("admin")
+		password = string(common.Md5Pass("admin"))
 	}
 
 	if username == "" || password == "" {
