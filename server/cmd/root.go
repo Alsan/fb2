@@ -3,30 +3,38 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"os"
+	"os/signal"
+	"path/filepath"
 	"strings"
+	"syscall"
 
 	fb "github.com/alsan/filebrowser/proto"
 	"github.com/alsan/filebrowser/server/auth"
+	"github.com/alsan/filebrowser/server/diskcache"
+	"github.com/alsan/filebrowser/server/frontend"
+	fbhttp "github.com/alsan/filebrowser/server/http"
+	"github.com/alsan/filebrowser/server/img"
 	"github.com/alsan/filebrowser/server/rpc"
 	"github.com/alsan/filebrowser/server/settings"
 	"github.com/alsan/filebrowser/server/storage"
 	"github.com/alsan/filebrowser/server/users"
+	"github.com/alsan/filebrowser/utils"
 	u "github.com/alsan/filebrowser/utils"
 	"github.com/mitchellh/go-homedir"
 	"github.com/soheilhy/cmux"
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	v "github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
-
-const PORT = 8080
 
 var (
 	cfgFile string
@@ -76,14 +84,99 @@ func grpcServer(listener net.Listener) {
 	u.ExitIfError("Unable to start grpc server: %v", err)
 }
 
-func httpServer(listener net.Listener) {
-	// the handler HAVE TO BE registered before Serve() is called
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, world!")
-	})
+func setupDb(cmd *cobra.Command, d pythonData) {
+	if !d.hadDB {
+		quickSetup(cmd.Flags(), d)
+	}
+}
 
-	err := http.Serve(listener, nil)
+func httpServer(listener net.Listener, handler http.Handler) {
+	err := http.Serve(listener, handler)
 	u.ExitIfError("Unable to start http server: %v", err)
+}
+
+func getImgSvc(cmd *cobra.Command) *img.Service {
+	workersCount, err := cmd.Flags().GetInt("img-processors")
+	checkErr(err)
+	if workersCount < 1 {
+		log.Fatal("Image resize workers count could not be < 1")
+	}
+
+	return img.New(workersCount)
+}
+
+func getFileCache(cmd *cobra.Command) diskcache.Interface {
+	var fileCache diskcache.Interface = diskcache.NewNoOp()
+	cacheDir, err := cmd.Flags().GetString("cache-dir")
+	checkErr(err)
+
+	if cacheDir != "" {
+		if err := os.MkdirAll(cacheDir, 0700); err != nil {
+			log.Fatalf("can't make directory %s: %v", cacheDir, err)
+		}
+		fileCache = diskcache.New(afero.NewOsFs(), cacheDir)
+	}
+
+	return fileCache
+}
+
+func getAssetsFs() fs.FS {
+	assetsFs, err := fs.Sub(frontend.Assets(), "dist")
+	utils.ExitIfError("Unable to get assets directory", err)
+
+	return assetsFs
+}
+
+func setupHttpHandler(cmd *cobra.Command, d pythonData, serverConf *settings.Server) http.Handler {
+	imgSvc := getImgSvc(cmd)
+	fileCache := getFileCache(cmd)
+	assetsFs := getAssetsFs()
+
+	handler, err := fbhttp.NewHandler(imgSvc, fileCache, d.store, serverConf, assetsFs)
+	checkErr(err)
+
+	return handler
+}
+
+func captureOsSignalNotification(listener net.Listener) {
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
+	go cleanupHandler(listener, sigc)
+}
+
+func getListener(serverConf *settings.Server, addr string) net.Listener {
+	listener, err := net.Listen("tcp", addr)
+	u.ExitIfError(fmt.Sprintf("Unable to listen to port :%s", addr), err)
+
+	return listener
+}
+
+func setupServer(cmd *cobra.Command, d pythonData, serverConf *settings.Server, addr string) {
+	listener := getListener(serverConf, addr)
+
+	captureOsSignalNotification(listener)
+	defer listener.Close()
+
+	tcpm := cmux.New(listener)
+	grpcFilter := tcpm.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
+	httpFilter := tcpm.Match(cmux.Any())
+	handler := setupHttpHandler(cmd, d, serverConf)
+
+	go grpcServer(grpcFilter)
+	go httpServer(httpFilter, handler)
+
+	log.Printf("server listenering on port :%s", addr)
+	if err := tcpm.Serve(); err != nil {
+		log.Fatalf("Error serving cmux: %v", err)
+	}
+}
+
+func setupServerConf(conf *settings.Server) {
+	setupLog(conf.Log)
+
+	root, err := filepath.Abs(conf.Root)
+	checkErr(err)
+	conf.Root = root
 }
 
 var rootCmd = &cobra.Command{
@@ -125,28 +218,12 @@ Also, if the database path doesn't exist, File Browser will enter into
 the quick setup mode and a new database will be bootstraped and a new
 user created with the credentials from options "username" and "password".`,
 	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
-		// create a listener at the desired port
-		listener, err := net.Listen("tcp", fmt.Sprintf(":%d", PORT))
-		u.ExitIfError(fmt.Sprintf("Unable to listen to port :%d", PORT), err)
+		serverConf := getRunParams(cmd.Flags(), d.store)
+		addr := serverConf.Address + ":" + serverConf.Port
 
-		// close the listener when done
-		defer listener.Close()
-
-		// create a cmux object
-		tcpm := cmux.New(listener)
-
-		// declare the match rules for different services requested
-		grpcFilter := tcpm.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
-		httpFilter := tcpm.Match(cmux.Any())
-
-		// initialize the servers by passing in the custom listeners
-		go grpcServer(grpcFilter)
-		go httpServer(httpFilter)
-
-		log.Printf("server listenering on port :%d", PORT)
-		if err := tcpm.Serve(); err != nil {
-			log.Fatalf("Error serving cmux: %v", err)
-		}
+		setupServerConf(serverConf)
+		setupDb(cmd, d)
+		setupServer(cmd, d, serverConf, addr)
 	}, pythonConfig{allowNoDB: true}),
 }
 
