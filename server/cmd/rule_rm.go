@@ -5,6 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	c "github.com/alsan/filebrowser/common"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/alsan/filebrowser/server/settings"
 	"github.com/alsan/filebrowser/server/users"
 )
@@ -40,27 +42,27 @@ including 'index_end'.`,
 
 		return nil
 	},
-	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
+	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
 		i, err := strconv.Atoi(args[0])
-		checkErr(err)
+		c.CheckErr(err)
 		f := i
 		if len(args) == 2 { //nolint:gomnd
 			f, err = strconv.Atoi(args[1])
-			checkErr(err)
+			c.CheckErr(err)
 		}
 
 		user := func(u *users.User) {
 			u.Rules = append(u.Rules[:i], u.Rules[f+1:]...)
-			err := d.store.Users.Save(u)
-			checkErr(err)
+			err := d.Store.Users.Save(u)
+			c.CheckErr(err)
 		}
 
 		global := func(s *settings.Settings) {
 			s.Rules = append(s.Rules[:i], s.Rules[f+1:]...)
-			err := d.store.Settings.Save(s)
-			checkErr(err)
+			err := d.Store.Settings.Save(s)
+			c.CheckErr(err)
 		}
 
-		runRules(d.store, cmd, user, global)
-	}, pythonConfig{}),
+		runRules(d.Store, cmd, user, global)
+	}, h.PythonConfig{}),
 }

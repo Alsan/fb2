@@ -3,7 +3,8 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/alsan/filebrowser/common"
+	c "github.com/alsan/filebrowser/common"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/alsan/filebrowser/server/settings"
 	"github.com/alsan/filebrowser/server/users"
 )
@@ -22,7 +23,7 @@ var usersUpdateCmd = &cobra.Command{
 	Long: `Updates an existing user. Set the flags for the
 options you want to change.`,
 	Args: cobra.ExactArgs(1),
-	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
+	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
 		username, id := parseUsernameOrID(args[0])
 		flags := cmd.Flags()
 		password := mustGetString(flags, "password")
@@ -34,12 +35,12 @@ options you want to change.`,
 		)
 
 		if id != 0 {
-			user, err = d.store.Users.Get("", id)
+			user, err = d.Store.Users.Get("", id)
 		} else {
-			user, err = d.store.Users.Get("", username)
+			user, err = d.Store.Users.Get("", username)
 		}
 
-		checkErr(err)
+		c.CheckErr(err)
 
 		defaults := settings.UserDefaults{
 			Scope:       user.Scope,
@@ -65,11 +66,11 @@ options you want to change.`,
 		}
 
 		if password != "" {
-			user.Password = string(common.Md5Pass(password))
+			user.Password = string(c.Md5Pass(password))
 		}
 
-		err = d.store.Users.Update(user)
-		checkErr(err)
+		err = d.Store.Users.Update(user)
+		c.CheckErr(err)
 		printUsers([]*users.User{user})
-	}, pythonConfig{}),
+	}, h.PythonConfig{}),
 }

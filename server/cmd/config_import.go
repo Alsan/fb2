@@ -8,7 +8,9 @@ import (
 
 	"github.com/spf13/cobra"
 
+	c "github.com/alsan/filebrowser/common"
 	"github.com/alsan/filebrowser/server/auth"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/alsan/filebrowser/server/settings"
 )
 
@@ -34,11 +36,11 @@ database.
 
 The path must be for a json or yaml file.`,
 	Args: jsonYamlArg,
-	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
+	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
 		var key []byte
-		if d.hadDB {
-			settings, err := d.store.Settings.Get()
-			checkErr(err)
+		if d.HadDB {
+			settings, err := d.Store.Settings.Get()
+			c.CheckErr(err)
 			key = settings.Key
 		} else {
 			key = generateKey()
@@ -46,14 +48,14 @@ The path must be for a json or yaml file.`,
 
 		file := settingsFile{}
 		err := unmarshal(args[0], &file)
-		checkErr(err)
+		c.CheckErr(err)
 
 		file.Settings.Key = key
-		err = d.store.Settings.Save(file.Settings)
-		checkErr(err)
+		err = d.Store.Settings.Save(file.Settings)
+		c.CheckErr(err)
 
-		err = d.store.Settings.SaveServer(file.Server)
-		checkErr(err)
+		err = d.Store.Settings.SaveServer(file.Server)
+		c.CheckErr(err)
 
 		var rawAuther interface{}
 		if filepath.Ext(args[0]) != ".json" { //nolint:goconst
@@ -71,22 +73,22 @@ The path must be for a json or yaml file.`,
 		case auth.MethodProxyAuth:
 			auther = getAuther(auth.ProxyAuth{}, rawAuther).(*auth.ProxyAuth)
 		default:
-			checkErr(errors.New("invalid auth method"))
+			c.CheckErr(errors.New("invalid auth method"))
 		}
 
-		err = d.store.Auth.Save(auther)
-		checkErr(err)
+		err = d.Store.Auth.Save(auther)
+		c.CheckErr(err)
 
 		printSettings(file.Server, file.Settings, auther)
-	}, pythonConfig{allowNoDB: true}),
+	}, h.PythonConfig{AllowNoDB: true}),
 }
 
 func getAuther(sample auth.Auther, data interface{}) interface{} {
 	authType := reflect.TypeOf(sample)
 	auther := reflect.New(authType).Interface()
 	bytes, err := json.Marshal(data)
-	checkErr(err)
+	c.CheckErr(err)
 	err = json.Unmarshal(bytes, &auther)
-	checkErr(err)
+	c.CheckErr(err)
 	return auther
 }

@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	c "github.com/alsan/filebrowser/common"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -14,9 +16,9 @@ var cmdsLsCmd = &cobra.Command{
 	Short: "List all commands for each event",
 	Long:  `List all commands for each event.`,
 	Args:  cobra.NoArgs,
-	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
-		s, err := d.store.Settings.Get()
-		checkErr(err)
+	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
+		s, err := d.Store.Settings.Get()
+		c.CheckErr(err)
 		evt := mustGetString(cmd.Flags(), "event")
 
 		if evt == "" {
@@ -27,5 +29,5 @@ var cmdsLsCmd = &cobra.Command{
 			show["after_"+evt] = s.Commands["after_"+evt]
 			printEvents(show)
 		}
-	}, pythonConfig{}),
+	}, h.PythonConfig{}),
 }

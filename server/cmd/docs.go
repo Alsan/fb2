@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strings"
 
+	c "github.com/alsan/filebrowser/common"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -57,7 +58,7 @@ var docsCmd = &cobra.Command{
 			return nil
 		})
 
-		checkErr(err)
+		c.CheckErr(err)
 		printToc(names)
 	},
 }
@@ -74,7 +75,7 @@ func generateDocs(cmd *cobra.Command, dir string) {
 	basename := strings.Replace(cmd.CommandPath(), " ", "-", -1) + ".md"
 	filename := filepath.Join(dir, basename)
 	f, err := os.Create(filename)
-	checkErr(err)
+	c.CheckErr(err)
 	defer f.Close()
 	generateMarkdown(cmd, f)
 }
@@ -108,7 +109,7 @@ func generateMarkdown(cmd *cobra.Command, w io.Writer) {
 
 	printOptions(buf, cmd)
 	_, err := buf.WriteTo(w)
-	checkErr(err)
+	c.CheckErr(err)
 }
 
 func generateFlagsTable(fs *pflag.FlagSet, buf io.StringWriter) {

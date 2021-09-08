@@ -3,7 +3,8 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/alsan/filebrowser/common"
+	c "github.com/alsan/filebrowser/common"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/alsan/filebrowser/server/users"
 )
 
@@ -17,12 +18,12 @@ var usersAddCmd = &cobra.Command{
 	Short: "Create a new user",
 	Long:  `Create a new user and add it to the database.`,
 	Args:  cobra.ExactArgs(2), //nolint:gomnd
-	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
-		s, err := d.store.Settings.Get()
-		checkErr(err)
+	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
+		s, err := d.Store.Settings.Get()
+		c.CheckErr(err)
 		getUserDefaults(cmd.Flags(), &s.Defaults, false)
 
-		password := string(common.Md5Pass(args[1]))
+		password := string(c.Md5Pass(args[1]))
 
 		user := &users.User{
 			Username:     args[0],
@@ -32,20 +33,20 @@ var usersAddCmd = &cobra.Command{
 
 		s.Defaults.Apply(user)
 
-		servSettings, err := d.store.Settings.GetServer()
-		checkErr(err)
+		servSettings, err := d.Store.Settings.GetServer()
+		c.CheckErr(err)
 		// since getUserDefaults() polluted s.Defaults.Scope
 		// which makes the Scope not the one saved in the db
 		// we need the right s.Defaults.Scope here
-		s2, err := d.store.Settings.Get()
-		checkErr(err)
+		s2, err := d.Store.Settings.Get()
+		c.CheckErr(err)
 
 		userHome, err := s2.MakeUserDir(user.Username, user.Scope, servSettings.Root)
-		checkErr(err)
+		c.CheckErr(err)
 		user.Scope = userHome
 
-		err = d.store.Users.Save(user)
-		checkErr(err)
+		err = d.Store.Users.Save(user)
+		c.CheckErr(err)
 		printUsers([]*users.User{user})
-	}, pythonConfig{}),
+	}, h.PythonConfig{}),
 }

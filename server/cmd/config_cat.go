@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	c "github.com/alsan/filebrowser/common"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -13,13 +15,13 @@ var configCatCmd = &cobra.Command{
 	Short: "Prints the configuration",
 	Long:  `Prints the configuration.`,
 	Args:  cobra.NoArgs,
-	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
-		set, err := d.store.Settings.Get()
-		checkErr(err)
-		ser, err := d.store.Settings.GetServer()
-		checkErr(err)
-		auther, err := d.store.Auth.Get(set.AuthMethod)
-		checkErr(err)
+	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
+		set, err := d.Store.Settings.Get()
+		c.CheckErr(err)
+		ser, err := d.Store.Settings.GetServer()
+		c.CheckErr(err)
+		auther, err := d.Store.Auth.Get(set.AuthMethod)
+		c.CheckErr(err)
 		printSettings(ser, set, auther)
-	}, pythonConfig{}),
+	}, h.PythonConfig{}),
 }

@@ -3,6 +3,8 @@ package cmd
 import (
 	"strconv"
 
+	c "github.com/alsan/filebrowser/common"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -35,22 +37,22 @@ including 'index_end'.`,
 
 		return nil
 	},
-	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
-		s, err := d.store.Settings.Get()
-		checkErr(err)
+	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
+		s, err := d.Store.Settings.Get()
+		c.CheckErr(err)
 		evt := args[0]
 
 		i, err := strconv.Atoi(args[1])
-		checkErr(err)
+		c.CheckErr(err)
 		f := i
 		if len(args) == 3 { //nolint:gomnd
 			f, err = strconv.Atoi(args[2])
-			checkErr(err)
+			c.CheckErr(err)
 		}
 
 		s.Commands[evt] = append(s.Commands[evt][:i], s.Commands[evt][f+1:]...)
-		err = d.store.Settings.Save(s)
-		checkErr(err)
+		err = d.Store.Settings.Save(s)
+		c.CheckErr(err)
 		printEvents(s.Commands)
-	}, pythonConfig{}),
+	}, h.PythonConfig{}),
 }

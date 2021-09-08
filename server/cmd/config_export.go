@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	c "github.com/alsan/filebrowser/common"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -15,15 +17,15 @@ var configExportCmd = &cobra.Command{
 json or yaml file. This exported configuration can be changed,
 and imported again with 'config import' command.`,
 	Args: jsonYamlArg,
-	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
-		settings, err := d.store.Settings.Get()
-		checkErr(err)
+	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
+		settings, err := d.Store.Settings.Get()
+		c.CheckErr(err)
 
-		server, err := d.store.Settings.GetServer()
-		checkErr(err)
+		server, err := d.Store.Settings.GetServer()
+		c.CheckErr(err)
 
-		auther, err := d.store.Auth.Get(settings.AuthMethod)
-		checkErr(err)
+		auther, err := d.Store.Auth.Get(settings.AuthMethod)
+		c.CheckErr(err)
 
 		data := &settingsFile{
 			Settings: settings,
@@ -32,6 +34,6 @@ and imported again with 'config import' command.`,
 		}
 
 		err = marshal(args[0], data)
-		checkErr(err)
-	}, pythonConfig{}),
+		c.CheckErr(err)
+	}, h.PythonConfig{}),
 }

@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	c "github.com/alsan/filebrowser/common"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -14,11 +16,11 @@ var usersExportCmd = &cobra.Command{
 	Long: `Export all users to a json or yaml file. Please indicate the
 path to the file where you want to write the users.`,
 	Args: jsonYamlArg,
-	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
-		list, err := d.store.Users.Gets("")
-		checkErr(err)
+	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
+		list, err := d.Store.Users.Gets("")
+		c.CheckErr(err)
 
 		err = marshal(args[0], list)
-		checkErr(err)
-	}, pythonConfig{}),
+		c.CheckErr(err)
+	}, h.PythonConfig{}),
 }

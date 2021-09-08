@@ -3,6 +3,8 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
+	c "github.com/alsan/filebrowser/common"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/alsan/filebrowser/server/users"
 )
 
@@ -26,7 +28,7 @@ var usersLsCmd = &cobra.Command{
 	Run:   findUsers,
 }
 
-var findUsers = python(func(cmd *cobra.Command, args []string, d pythonData) {
+var findUsers = h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
 	var (
 		list []*users.User
 		user *users.User
@@ -36,16 +38,16 @@ var findUsers = python(func(cmd *cobra.Command, args []string, d pythonData) {
 	if len(args) == 1 {
 		username, id := parseUsernameOrID(args[0])
 		if username != "" {
-			user, err = d.store.Users.Get("", username)
+			user, err = d.Store.Users.Get("", username)
 		} else {
-			user, err = d.store.Users.Get("", id)
+			user, err = d.Store.Users.Get("", id)
 		}
 
 		list = []*users.User{user}
 	} else {
-		list, err = d.store.Users.Gets("")
+		list, err = d.Store.Users.Gets("")
 	}
 
-	checkErr(err)
+	c.CheckErr(err)
 	printUsers(list)
-}, pythonConfig{})
+}, h.PythonConfig{})

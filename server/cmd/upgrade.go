@@ -3,6 +3,8 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
+	c "github.com/alsan/filebrowser/common"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/alsan/filebrowser/server/storage/bolt/importer"
 )
 
@@ -25,7 +27,7 @@ this version.`,
 		flags := cmd.Flags()
 		oldDB := mustGetString(flags, "old.database")
 		oldConf := mustGetString(flags, "old.config")
-		err := importer.Import(oldDB, oldConf, getParam(flags, "database"))
-		checkErr(err)
+		err := importer.Import(oldDB, oldConf, h.GetParam(flags, "database"))
+		c.CheckErr(err)
 	},
 }

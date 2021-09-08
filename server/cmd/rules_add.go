@@ -5,6 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	c "github.com/alsan/filebrowser/common"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/alsan/filebrowser/server/rules"
 	"github.com/alsan/filebrowser/server/settings"
 	"github.com/alsan/filebrowser/server/users"
@@ -21,7 +23,7 @@ var rulesAddCmd = &cobra.Command{
 	Short: "Add a global rule or user rule",
 	Long:  `Add a global rule or user rule.`,
 	Args:  cobra.ExactArgs(1),
-	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
+	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
 		allow := mustGetBool(cmd.Flags(), "allow")
 		regex := mustGetBool(cmd.Flags(), "regex")
 		exp := args[0]
@@ -43,16 +45,16 @@ var rulesAddCmd = &cobra.Command{
 
 		user := func(u *users.User) {
 			u.Rules = append(u.Rules, rule)
-			err := d.store.Users.Save(u)
-			checkErr(err)
+			err := d.Store.Users.Save(u)
+			c.CheckErr(err)
 		}
 
 		global := func(s *settings.Settings) {
 			s.Rules = append(s.Rules, rule)
-			err := d.store.Settings.Save(s)
-			checkErr(err)
+			err := d.Store.Settings.Save(s)
+			c.CheckErr(err)
 		}
 
-		runRules(d.store, cmd, user, global)
-	}, pythonConfig{}),
+		runRules(d.Store, cmd, user, global)
+	}, h.PythonConfig{}),
 }

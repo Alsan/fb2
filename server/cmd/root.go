@@ -14,11 +14,12 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/alsan/filebrowser/common"
+	c "github.com/alsan/filebrowser/common"
 	fb "github.com/alsan/filebrowser/proto"
 	"github.com/alsan/filebrowser/server/auth"
 	"github.com/alsan/filebrowser/server/diskcache"
 	"github.com/alsan/filebrowser/server/frontend"
+	h "github.com/alsan/filebrowser/server/helpers"
 	fbhttp "github.com/alsan/filebrowser/server/http"
 	"github.com/alsan/filebrowser/server/img"
 	"github.com/alsan/filebrowser/server/rpc"
@@ -80,23 +81,23 @@ func grpcServer(listener net.Listener) {
 	fb.RegisterFileBrowserRpcServiceServer(s, &rpc.Server{})
 
 	err := s.Serve(listener)
-	common.ExitIfError("Unable to start grpc server: %v", err)
+	c.ExitIfError("Unable to start grpc server: %v", err)
 }
 
-func setupDb(cmd *cobra.Command, d pythonData) {
-	if !d.hadDB {
+func setupDb(cmd *cobra.Command, d h.PythonData) {
+	if !d.HadDB {
 		quickSetup(cmd.Flags(), d)
 	}
 }
 
 func httpServer(listener net.Listener, handler http.Handler) {
 	err := http.Serve(listener, handler)
-	common.ExitIfError("Unable to start http server: %v", err)
+	c.ExitIfError("Unable to start http server: %v", err)
 }
 
 func getImgSvc(cmd *cobra.Command) *img.Service {
 	workersCount, err := cmd.Flags().GetInt("img-processors")
-	checkErr(err)
+	c.CheckErr(err)
 	if workersCount < 1 {
 		log.Fatal("Image resize workers count could not be < 1")
 	}
@@ -107,7 +108,7 @@ func getImgSvc(cmd *cobra.Command) *img.Service {
 func getFileCache(cmd *cobra.Command) diskcache.Interface {
 	var fileCache diskcache.Interface = diskcache.NewNoOp()
 	cacheDir, err := cmd.Flags().GetString("cache-dir")
-	checkErr(err)
+	c.CheckErr(err)
 
 	if cacheDir != "" {
 		if err := os.MkdirAll(cacheDir, 0700); err != nil {
@@ -121,18 +122,18 @@ func getFileCache(cmd *cobra.Command) diskcache.Interface {
 
 func getAssetsFs() fs.FS {
 	assetsFs, err := fs.Sub(frontend.Assets(), "dist")
-	common.ExitIfError("Unable to get assets directory", err)
+	c.ExitIfError("Unable to get assets directory", err)
 
 	return assetsFs
 }
 
-func setupHttpHandler(cmd *cobra.Command, d pythonData, serverConf *settings.Server) http.Handler {
+func setupHttpHandler(cmd *cobra.Command, d h.PythonData, serverConf *settings.Server) http.Handler {
 	imgSvc := getImgSvc(cmd)
 	fileCache := getFileCache(cmd)
 	assetsFs := getAssetsFs()
 
-	handler, err := fbhttp.NewHandler(imgSvc, fileCache, d.store, serverConf, assetsFs)
-	checkErr(err)
+	handler, err := fbhttp.NewHandler(imgSvc, fileCache, d.Store, serverConf, assetsFs)
+	c.CheckErr(err)
 
 	return handler
 }
@@ -145,33 +146,33 @@ func captureOsSignalNotification(listener net.Listener) {
 
 func getSocketLister(cmd *cobra.Command, serverConf *settings.Server) net.Listener {
 	listener, err := net.Listen("unix", serverConf.Socket)
-	checkErr(err)
+	c.CheckErr(err)
 
 	socketPerm, err := cmd.Flags().GetUint32("socket-perm") //nolint:govet
-	checkErr(err)
+	c.CheckErr(err)
 
 	err = os.Chmod(serverConf.Socket, os.FileMode(socketPerm))
-	checkErr(err)
+	c.CheckErr(err)
 
 	return listener
 }
 
 func getTlsListener(serverConf *settings.Server, addr string) net.Listener {
 	cer, err := tls.LoadX509KeyPair(serverConf.TLSCert, serverConf.TLSKey) //nolint:govet
-	checkErr(err)
+	c.CheckErr(err)
 
 	listener, err := tls.Listen("tcp", addr, &tls.Config{
 		MinVersion:   tls.VersionTLS12,
 		Certificates: []tls.Certificate{cer}},
 	)
-	checkErr(err)
+	c.CheckErr(err)
 
 	return listener
 }
 
 func getHttpListener(addr string) net.Listener {
 	listener, err := net.Listen("tcp", addr)
-	checkErr(err)
+	c.CheckErr(err)
 
 	return listener
 }
@@ -188,7 +189,7 @@ func getListener(cmd *cobra.Command, serverConf *settings.Server, addr string) n
 	return getHttpListener(addr)
 }
 
-func setupServer(cmd *cobra.Command, d pythonData, serverConf *settings.Server, addr string) {
+func setupServer(cmd *cobra.Command, d h.PythonData, serverConf *settings.Server, addr string) {
 	listener := getListener(cmd, serverConf, addr)
 
 	captureOsSignalNotification(listener)
@@ -212,7 +213,7 @@ func setupServerConf(conf *settings.Server) {
 	setupLog(conf.Log)
 
 	root, err := filepath.Abs(conf.Root)
-	checkErr(err)
+	c.CheckErr(err)
 	conf.Root = root
 }
 
@@ -254,14 +255,14 @@ set FB_DATABASE.
 Also, if the database path doesn't exist, File Browser will enter into
 the quick setup mode and a new database will be bootstraped and a new
 user created with the credentials from options "username" and "password".`,
-	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
-		serverConf := getRunParams(cmd.Flags(), d.store)
+	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
+		serverConf := getRunParams(cmd.Flags(), d.Store)
 		addr := serverConf.Address + ":" + serverConf.Port
 
 		setupServerConf(serverConf)
 		setupDb(cmd, d)
 		setupServer(cmd, d, serverConf, addr)
-	}, pythonConfig{allowNoDB: true}),
+	}, h.PythonConfig{AllowNoDB: true}),
 }
 
 func cleanupHandler(listener net.Listener, c chan os.Signal) { //nolint:interfacer
@@ -274,50 +275,50 @@ func cleanupHandler(listener net.Listener, c chan os.Signal) { //nolint:interfac
 //nolint:gocyclo
 func getRunParams(flags *pflag.FlagSet, st *storage.Storage) *settings.Server {
 	server, err := st.Settings.GetServer()
-	checkErr(err)
+	c.CheckErr(err)
 
-	if val, set := getParamB(flags, "root"); set {
+	if val, set := h.GetParamB(flags, "root"); set {
 		server.Root = val
 	}
 
-	if val, set := getParamB(flags, "baseurl"); set {
+	if val, set := h.GetParamB(flags, "baseurl"); set {
 		server.BaseURL = val
 	}
 
-	if val, set := getParamB(flags, "log"); set {
+	if val, set := h.GetParamB(flags, "log"); set {
 		server.Log = val
 	}
 
 	isSocketSet := false
 	isAddrSet := false
 
-	if val, set := getParamB(flags, "address"); set {
+	if val, set := h.GetParamB(flags, "address"); set {
 		server.Address = val
 		isAddrSet = isAddrSet || set
 	}
 
-	if val, set := getParamB(flags, "port"); set {
+	if val, set := h.GetParamB(flags, "port"); set {
 		server.Port = val
 		isAddrSet = isAddrSet || set
 	}
 
-	if val, set := getParamB(flags, "key"); set {
+	if val, set := h.GetParamB(flags, "key"); set {
 		server.TLSKey = val
 		isAddrSet = isAddrSet || set
 	}
 
-	if val, set := getParamB(flags, "cert"); set {
+	if val, set := h.GetParamB(flags, "cert"); set {
 		server.TLSCert = val
 		isAddrSet = isAddrSet || set
 	}
 
-	if val, set := getParamB(flags, "socket"); set {
+	if val, set := h.GetParamB(flags, "socket"); set {
 		server.Socket = val
 		isSocketSet = isSocketSet || set
 	}
 
 	if isAddrSet && isSocketSet {
-		checkErr(errors.New("--socket flag cannot be used with --address, --port, --key nor --cert"))
+		c.CheckErr(errors.New("--socket flag cannot be used with --address, --port, --key nor --cert"))
 	}
 
 	// Do not use saved Socket if address was manually set.
@@ -325,48 +326,19 @@ func getRunParams(flags *pflag.FlagSet, st *storage.Storage) *settings.Server {
 		server.Socket = ""
 	}
 
-	_, disableThumbnails := getParamB(flags, "disable-thumbnails")
+	_, disableThumbnails := h.GetParamB(flags, "disable-thumbnails")
 	server.EnableThumbnails = !disableThumbnails
 
-	_, disablePreviewResize := getParamB(flags, "disable-preview-resize")
+	_, disablePreviewResize := h.GetParamB(flags, "disable-preview-resize")
 	server.ResizePreview = !disablePreviewResize
 
-	_, disableTypeDetectionByHeader := getParamB(flags, "disable-type-detection-by-header")
+	_, disableTypeDetectionByHeader := h.GetParamB(flags, "disable-type-detection-by-header")
 	server.TypeDetectionByHeader = !disableTypeDetectionByHeader
 
-	_, disableExec := getParamB(flags, "disable-exec")
+	_, disableExec := h.GetParamB(flags, "disable-exec")
 	server.EnableExec = !disableExec
 
 	return server
-}
-
-// getParamB returns a parameter as a string and a boolean to tell if it is different from the default
-//
-// NOTE: we could simply bind the flags to viper and use IsSet.
-// Although there is a bug on Viper that always returns true on IsSet
-// if a flag is binded. Our alternative way is to manually check
-// the flag and then the value from env/config/gotten by viper.
-// https://github.com/spf13/viper/pull/331
-func getParamB(flags *pflag.FlagSet, key string) (string, bool) {
-	value, _ := flags.GetString(key)
-
-	// If set on Flags, use it.
-	if flags.Changed(key) {
-		return value, true
-	}
-
-	// If set through viper (env, config), return it.
-	if v.IsSet(key) {
-		return v.GetString(key), true
-	}
-
-	// Otherwise use default value on flags.
-	return value, false
-}
-
-func getParam(flags *pflag.FlagSet, key string) string {
-	val, _ := getParamB(flags, key)
-	return val
 }
 
 func setupLog(logMethod string) {
@@ -387,7 +359,7 @@ func setupLog(logMethod string) {
 	}
 }
 
-func quickSetup(flags *pflag.FlagSet, d pythonData) {
+func quickSetup(flags *pflag.FlagSet, d h.PythonData) {
 	set := &settings.Settings{
 		Key:           generateKey(),
 		Signup:        false,
@@ -410,36 +382,36 @@ func quickSetup(flags *pflag.FlagSet, d pythonData) {
 	}
 
 	var err error
-	if _, noauth := getParamB(flags, "noauth"); noauth {
+	if _, noauth := h.GetParamB(flags, "noauth"); noauth {
 		set.AuthMethod = auth.MethodNoAuth
-		err = d.store.Auth.Save(&auth.NoAuth{})
+		err = d.Store.Auth.Save(&auth.NoAuth{})
 	} else {
 		set.AuthMethod = auth.MethodJSONAuth
-		err = d.store.Auth.Save(&auth.JSONAuth{})
+		err = d.Store.Auth.Save(&auth.JSONAuth{})
 	}
 
-	checkErr(err)
-	err = d.store.Settings.Save(set)
-	checkErr(err)
+	c.CheckErr(err)
+	err = d.Store.Settings.Save(set)
+	c.CheckErr(err)
 
 	ser := &settings.Server{
-		BaseURL: getParam(flags, "baseurl"),
-		Port:    getParam(flags, "port"),
-		Log:     getParam(flags, "log"),
-		TLSKey:  getParam(flags, "key"),
-		TLSCert: getParam(flags, "cert"),
-		Address: getParam(flags, "address"),
-		Root:    getParam(flags, "root"),
+		BaseURL: h.GetParam(flags, "baseurl"),
+		Port:    h.GetParam(flags, "port"),
+		Log:     h.GetParam(flags, "log"),
+		TLSKey:  h.GetParam(flags, "key"),
+		TLSCert: h.GetParam(flags, "cert"),
+		Address: h.GetParam(flags, "address"),
+		Root:    h.GetParam(flags, "root"),
 	}
 
-	err = d.store.Settings.SaveServer(ser)
-	checkErr(err)
+	err = d.Store.Settings.SaveServer(ser)
+	c.CheckErr(err)
 
-	username := getParam(flags, "username")
-	password := getParam(flags, "password")
+	username := h.GetParam(flags, "username")
+	password := h.GetParam(flags, "password")
 
 	if password == "" {
-		password = string(common.Md5Pass("admin"))
+		password = string(c.Md5Pass("admin"))
 	}
 
 	if username == "" || password == "" {
@@ -455,16 +427,14 @@ func quickSetup(flags *pflag.FlagSet, d pythonData) {
 	set.Defaults.Apply(user)
 	user.Perm.Admin = true
 
-	err = d.store.Users.Save(user)
-	checkErr(err)
+	err = d.Store.Users.Save(user)
+	c.CheckErr(err)
 }
 
 func initConfig() {
-	log.Println("cfgFile: ", cfgFile)
-
 	if cfgFile == "" {
 		home, err := homedir.Dir()
-		checkErr(err)
+		c.CheckErr(err)
 		v.AddConfigPath(".")
 		v.AddConfigPath(home)
 		v.AddConfigPath("/etc/filebrowser/")

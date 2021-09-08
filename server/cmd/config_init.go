@@ -3,6 +3,8 @@ package cmd
 import (
 	"fmt"
 
+	c "github.com/alsan/filebrowser/common"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/spf13/cobra"
 
 	"github.com/alsan/filebrowser/server/settings"
@@ -22,7 +24,7 @@ this options can be changed in the future with the command
 to the defaults when creating new users and you don't
 override the options.`,
 	Args: cobra.NoArgs,
-	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
+	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
 		defaults := settings.UserDefaults{}
 		flags := cmd.Flags()
 		getUserDefaults(flags, &defaults, true)
@@ -52,12 +54,12 @@ override the options.`,
 			Log:     mustGetString(flags, "log"),
 		}
 
-		err := d.store.Settings.Save(s)
-		checkErr(err)
-		err = d.store.Settings.SaveServer(ser)
-		checkErr(err)
-		err = d.store.Auth.Save(auther)
-		checkErr(err)
+		err := d.Store.Settings.Save(s)
+		c.CheckErr(err)
+		err = d.Store.Settings.SaveServer(ser)
+		c.CheckErr(err)
+		err = d.Store.Auth.Save(auther)
+		c.CheckErr(err)
 
 		fmt.Printf(`
 Congratulations! You've set up your database to use with File Browser.
@@ -65,5 +67,5 @@ Now add your first user via 'filebrowser users add' and then you just
 need to call the main command to boot up the server.
 `)
 		printSettings(ser, s, auther)
-	}, pythonConfig{noDB: true}),
+	}, h.PythonConfig{NoDB: true}),
 }

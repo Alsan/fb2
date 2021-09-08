@@ -2,9 +2,14 @@ package rpc
 
 import (
 	"context"
-	"log"
 
 	fb "github.com/alsan/filebrowser/proto"
+	h "github.com/alsan/filebrowser/server/helpers"
+)
+
+var (
+	Data    h.PythonData
+	Session string
 )
 
 type Server struct {
@@ -12,7 +17,8 @@ type Server struct {
 }
 
 func (s *Server) Login(ctx context.Context, in *fb.LoginRequest) (*fb.LoginReply, error) {
-	log.Printf("Login request received: %s", in.GetUsername())
+	// username := in.GetUsername()
+	// password := in.GetPassword()
 
 	return &fb.LoginReply{
 		Status: fb.ReplyStatus_Ok,

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/alsan/filebrowser/client/utils"
-	"github.com/alsan/filebrowser/common"
+	c "github.com/alsan/filebrowser/common"
 	fb "github.com/alsan/filebrowser/proto"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
@@ -18,7 +18,7 @@ func init() {
 
 func getServer() string {
 	server, err := utils.GetUserInput("Server (localhost:8080)")
-	common.CheckErr(err)
+	c.CheckErr(err)
 
 	if server == "" {
 		server = "localhost:8080"
@@ -29,21 +29,21 @@ func getServer() string {
 
 func getUsername() string {
 	username, err := utils.GetUserInput("Username")
-	common.CheckErr(err)
+	c.CheckErr(err)
 
 	return username
 }
 
 func getPassword() string {
 	password, err := utils.GetUserPasswordInput()
-	common.CheckErr(err)
+	c.CheckErr(err)
 
-	return string(common.BcryptHash(common.Md5Pass(password)))
+	return string(c.BcryptHash(c.Md5Pass(password)))
 }
 
 func doLogin(server string, username string, password string) *fb.LoginReply {
 	conn, err := grpc.Dial(server, grpc.WithInsecure(), grpc.WithBlock())
-	common.ExitIfError("Unable to connect to server, %v", err)
+	c.ExitIfError("Unable to connect to server, %v", err)
 	defer conn.Close()
 	client := fb.NewFileBrowserRpcServiceClient(conn)
 
@@ -54,7 +54,7 @@ func doLogin(server string, username string, password string) *fb.LoginReply {
 		Username: username,
 		Password: password,
 	})
-	common.ExitIfError("Unable to login, %v", err)
+	c.ExitIfError("Unable to login, %v", err)
 
 	return reply
 }

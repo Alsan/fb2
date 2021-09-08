@@ -8,6 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	c "github.com/alsan/filebrowser/common"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/alsan/filebrowser/server/users"
 )
 
@@ -25,50 +27,50 @@ file. You can use this command to import new users to your
 installation. For that, just don't place their ID on the files
 list or set it to 0.`,
 	Args: jsonYamlArg,
-	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
+	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
 		fd, err := os.Open(args[0])
-		checkErr(err)
+		c.CheckErr(err)
 		defer fd.Close()
 
 		list := []*users.User{}
 		err = unmarshal(args[0], &list)
-		checkErr(err)
+		c.CheckErr(err)
 
 		for _, user := range list {
 			err = user.Clean("")
-			checkErr(err)
+			c.CheckErr(err)
 		}
 
 		if mustGetBool(cmd.Flags(), "replace") {
-			oldUsers, err := d.store.Users.Gets("")
-			checkErr(err)
+			oldUsers, err := d.Store.Users.Gets("")
+			c.CheckErr(err)
 
 			err = marshal("users.backup.json", list)
-			checkErr(err)
+			c.CheckErr(err)
 
 			for _, user := range oldUsers {
-				err = d.store.Users.Delete(user.ID)
-				checkErr(err)
+				err = d.Store.Users.Delete(user.ID)
+				c.CheckErr(err)
 			}
 		}
 
 		overwrite := mustGetBool(cmd.Flags(), "overwrite")
 
 		for _, user := range list {
-			onDB, err := d.store.Users.Get("", user.ID)
+			onDB, err := d.Store.Users.Get("", user.ID)
 
 			// User exists in DB.
 			if err == nil {
 				if !overwrite {
-					checkErr(errors.New("user " + strconv.Itoa(int(user.ID)) + " is already registred"))
+					c.CheckErr(errors.New("user " + strconv.Itoa(int(user.ID)) + " is already registred"))
 				}
 
 				// If the usernames mismatch, check if there is another one in the DB
 				// with the new username. If there is, print an error and cancel the
 				// operation
 				if user.Username != onDB.Username {
-					if conflictuous, err := d.store.Users.Get("", user.Username); err == nil { //nolint:govet
-						checkErr(usernameConflictError(user.Username, conflictuous.ID, user.ID))
+					if conflictuous, err := d.Store.Users.Get("", user.Username); err == nil { //nolint:govet
+						c.CheckErr(usernameConflictError(user.Username, conflictuous.ID, user.ID))
 					}
 				}
 			} else {
@@ -77,10 +79,10 @@ list or set it to 0.`,
 				user.ID = 0
 			}
 
-			err = d.store.Users.Save(user)
-			checkErr(err)
+			err = d.Store.Users.Save(user)
+			c.CheckErr(err)
 		}
-	}, pythonConfig{}),
+	}, h.PythonConfig{}),
 }
 
 func usernameConflictError(username string, originalID, newID uint) error {

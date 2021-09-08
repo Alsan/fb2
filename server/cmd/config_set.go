@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	c "github.com/alsan/filebrowser/common"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -16,13 +18,13 @@ var configSetCmd = &cobra.Command{
 	Long: `Updates the configuration. Set the flags for the options
 you want to change. Other options will remain unchanged.`,
 	Args: cobra.NoArgs,
-	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
+	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
 		flags := cmd.Flags()
-		set, err := d.store.Settings.Get()
-		checkErr(err)
+		set, err := d.Store.Settings.Get()
+		c.CheckErr(err)
 
-		ser, err := d.store.Settings.GetServer()
-		checkErr(err)
+		ser, err := d.Store.Settings.GetServer()
+		c.CheckErr(err)
 
 		hasAuth := false
 		flags.Visit(func(flag *pflag.Flag) {
@@ -61,18 +63,18 @@ you want to change. Other options will remain unchanged.`,
 		getUserDefaults(flags, &set.Defaults, false)
 
 		// read the defaults
-		auther, err := d.store.Auth.Get(set.AuthMethod)
-		checkErr(err)
+		auther, err := d.Store.Auth.Get(set.AuthMethod)
+		c.CheckErr(err)
 
 		// check if there are new flags for existing auth method
 		set.AuthMethod, auther = getAuthentication(flags, hasAuth, set, auther)
 
-		err = d.store.Auth.Save(auther)
-		checkErr(err)
-		err = d.store.Settings.Save(set)
-		checkErr(err)
-		err = d.store.Settings.SaveServer(ser)
-		checkErr(err)
+		err = d.Store.Auth.Save(auther)
+		c.CheckErr(err)
+		err = d.Store.Settings.Save(set)
+		c.CheckErr(err)
+		err = d.Store.Settings.SaveServer(ser)
+		c.CheckErr(err)
 		printSettings(ser, set, auther)
-	}, pythonConfig{}),
+	}, h.PythonConfig{}),
 }

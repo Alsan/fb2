@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	c "github.com/alsan/filebrowser/common"
 	"github.com/alsan/filebrowser/server/auth"
 	"github.com/alsan/filebrowser/server/errors"
 	"github.com/alsan/filebrowser/server/settings"
@@ -58,9 +59,9 @@ func getAuthentication(flags *pflag.FlagSet, defaults ...interface{}) (settings.
 					method = def.AuthMethod
 				case auth.Auther:
 					ms, err := json.Marshal(def)
-					checkErr(err)
+					c.CheckErr(err)
 					err = json.Unmarshal(ms, &defaultAuther)
-					checkErr(err)
+					c.CheckErr(err)
 				}
 			}
 		}
@@ -75,7 +76,7 @@ func getAuthentication(flags *pflag.FlagSet, defaults ...interface{}) (settings.
 		}
 
 		if header == "" {
-			checkErr(nerrors.New("you must set the flag 'auth.header' for method 'proxy'"))
+			c.CheckErr(nerrors.New("you must set the flag 'auth.header' for method 'proxy'"))
 		}
 
 		auther = &auth.ProxyAuth{Header: header}
@@ -162,6 +163,6 @@ func printSettings(ser *settings.Server, set *settings.Settings, auther auth.Aut
 	w.Flush()
 
 	b, err := json.MarshalIndent(auther, "", "  ")
-	checkErr(err)
+	c.CheckErr(err)
 	fmt.Printf("\nAuther configuration (raw):\n\n%s\n\n", string(b))
 }

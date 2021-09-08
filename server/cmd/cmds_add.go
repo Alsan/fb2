@@ -3,6 +3,8 @@ package cmd
 import (
 	"strings"
 
+	c "github.com/alsan/filebrowser/common"
+	h "github.com/alsan/filebrowser/server/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -15,13 +17,13 @@ var cmdsAddCmd = &cobra.Command{
 	Short: "Add a command to run on a specific event",
 	Long:  `Add a command to run on a specific event.`,
 	Args:  cobra.MinimumNArgs(2), //nolint:gomnd
-	Run: python(func(cmd *cobra.Command, args []string, d pythonData) {
-		s, err := d.store.Settings.Get()
-		checkErr(err)
+	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
+		s, err := d.Store.Settings.Get()
+		c.CheckErr(err)
 		command := strings.Join(args[1:], " ")
 		s.Commands[args[0]] = append(s.Commands[args[0]], command)
-		err = d.store.Settings.Save(s)
-		checkErr(err)
+		err = d.Store.Settings.Save(s)
+		c.CheckErr(err)
 		printEvents(s.Commands)
-	}, pythonConfig{}),
+	}, h.PythonConfig{}),
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	c "github.com/alsan/filebrowser/common"
 	"github.com/alsan/filebrowser/server/settings"
 	"github.com/alsan/filebrowser/server/users"
 )
@@ -82,7 +83,7 @@ func addUserFlags(flags *pflag.FlagSet) {
 func getViewMode(flags *pflag.FlagSet) users.ViewMode {
 	viewMode := users.ViewMode(mustGetString(flags, "viewMode"))
 	if viewMode != users.ListViewMode && viewMode != users.MosaicViewMode {
-		checkErr(errors.New("view mode must be \"" + string(users.ListViewMode) + "\" or \"" + string(users.MosaicViewMode) + "\""))
+		c.CheckErr(errors.New("view mode must be \"" + string(users.ListViewMode) + "\" or \"" + string(users.MosaicViewMode) + "\""))
 	}
 	return viewMode
 }
@@ -117,7 +118,7 @@ func getUserDefaults(flags *pflag.FlagSet, defaults *settings.UserDefaults, all 
 			defaults.Perm.Download = mustGetBool(flags, flag.Name)
 		case "commands":
 			commands, err := flags.GetStringSlice(flag.Name)
-			checkErr(err)
+			c.CheckErr(err)
 			defaults.Commands = commands
 		case "sorting.by":
 			defaults.Sorting.By = mustGetString(flags, flag.Name)
