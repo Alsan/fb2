@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"crypto/tls"
+	"encoding/hex"
 	"errors"
 	"io/fs"
 	"io/ioutil"
@@ -88,6 +89,8 @@ func setupDb(cmd *cobra.Command, d h.PythonData) {
 	if !d.HadDB {
 		quickSetup(cmd.Flags(), d)
 	}
+
+	rpc.SetStorage(&d)
 }
 
 func httpServer(listener net.Listener, handler http.Handler) {
@@ -411,7 +414,7 @@ func quickSetup(flags *pflag.FlagSet, d h.PythonData) {
 	password := h.GetParam(flags, "password")
 
 	if password == "" {
-		password = string(c.Md5Pass("admin"))
+		password = hex.EncodeToString(c.Md5Pass("admin"))
 	}
 
 	if username == "" || password == "" {

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -18,7 +19,7 @@ var hashCmd = &cobra.Command{
 	Long:  `Hashes a password using bcrypt algorithm.`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		pwd := c.Md5Pass(args[0])
+		pwd := hex.EncodeToString(c.Md5Pass(args[0]))
 
 		fmt.Println(pwd)
 	},

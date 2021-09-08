@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"encoding/hex"
+
 	"github.com/spf13/cobra"
 
 	c "github.com/alsan/filebrowser/common"
@@ -66,7 +68,7 @@ options you want to change.`,
 		}
 
 		if password != "" {
-			user.Password = string(c.Md5Pass(password))
+			user.Password = hex.EncodeToString(c.Md5Pass(password))
 		}
 
 		err = d.Store.Users.Update(user)

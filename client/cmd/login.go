@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"encoding/hex"
 	"log"
 	"time"
 
@@ -38,7 +39,11 @@ func getPassword() string {
 	password, err := utils.GetUserPasswordInput()
 	c.CheckErr(err)
 
-	return string(c.BcryptHash(c.Md5Pass(password)))
+	m := c.Md5Pass(password)
+	h := hex.EncodeToString(m)
+	b := []byte(h)
+
+	return string(c.BcryptHash(b))
 }
 
 func doLogin(server string, username string, password string) *fb.LoginReply {
@@ -54,7 +59,7 @@ func doLogin(server string, username string, password string) *fb.LoginReply {
 		Username: username,
 		Password: password,
 	})
-	c.ExitIfError("Unable to login, %v", err)
+	c.CheckErr(err)
 
 	return reply
 }

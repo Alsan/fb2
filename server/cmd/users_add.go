@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"encoding/hex"
+
 	"github.com/spf13/cobra"
 
 	c "github.com/alsan/filebrowser/common"
@@ -23,7 +25,7 @@ var usersAddCmd = &cobra.Command{
 		c.CheckErr(err)
 		getUserDefaults(cmd.Flags(), &s.Defaults, false)
 
-		password := string(c.Md5Pass(args[1]))
+		password := hex.EncodeToString(c.Md5Pass(args[1]))
 
 		user := &users.User{
 			Username:     args[0],

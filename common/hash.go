@@ -2,6 +2,8 @@ package common
 
 import (
 	"crypto/md5"
+	"encoding/hex"
+	"log"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
@@ -33,13 +35,17 @@ func Md5sum(password []byte) []byte {
 func Md5Pass(password string) []byte {
 	r := string(Reverse(password))
 	s := strings.Join(strings.Split(r, ""), ",")
+	b := Md5sum([]byte(s))
 
-	return Md5sum([]byte(s))
+	log.Printf("md5: %s", hex.EncodeToString(b))
+
+	return b
 }
 
 func BcryptHash(password []byte) []byte {
 	bytes, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
 	CheckErr(err)
 
+	log.Printf("bcrypt: %s", string(bytes))
 	return bytes
 }
