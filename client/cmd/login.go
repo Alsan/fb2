@@ -3,10 +3,10 @@ package cmd
 import (
 	"context"
 	"encoding/hex"
-	"log"
+	"fmt"
 	"time"
 
-	"github.com/alsan/filebrowser/client/utils"
+	u "github.com/alsan/filebrowser/client/utils"
 	c "github.com/alsan/filebrowser/common"
 	fb "github.com/alsan/filebrowser/proto"
 	"github.com/spf13/cobra"
@@ -18,7 +18,7 @@ func init() {
 }
 
 func getServer() string {
-	server, err := utils.GetUserInput("Server (localhost:8080)")
+	server, err := u.GetUserInput("Server (localhost:8080)")
 	c.CheckErr(err)
 
 	if server == "" {
@@ -29,14 +29,14 @@ func getServer() string {
 }
 
 func getUsername() string {
-	username, err := utils.GetUserInput("Username")
+	username, err := u.GetUserInput("Username")
 	c.CheckErr(err)
 
 	return username
 }
 
 func getPassword() string {
-	password, err := utils.GetUserPasswordInput()
+	password, err := u.GetUserPasswordInput()
 	c.CheckErr(err)
 
 	m := c.Md5Pass(password)
@@ -77,9 +77,11 @@ var loginCmd = &cobra.Command{
 		reply := doLogin(server, username, password)
 
 		if reply.GetStatus() == fb.ReplyStatus_Ok {
-			log.Printf("Login successful, Token: %s", reply.GetToken())
+			fmt.Printf("Login successful, Token: %s", reply.GetToken())
 		} else {
-			log.Printf("Login failed, message: %s", reply.GetMessage())
+			fmt.Printf("Login failed, message: %s", reply.GetMessage())
 		}
+
+		fmt.Println()
 	},
 }
