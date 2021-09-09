@@ -218,6 +218,8 @@ func setupServerConf(conf *settings.Server) {
 	root, err := filepath.Abs(conf.Root)
 	c.CheckErr(err)
 	conf.Root = root
+
+	rpc.SetServerConf(conf)
 }
 
 var rootCmd = &cobra.Command{
