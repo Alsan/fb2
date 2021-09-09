@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	c "github.com/alsan/filebrowser/common"
 	fb "github.com/alsan/filebrowser/proto"
@@ -55,15 +54,8 @@ func getFileList(path, filter string) []string {
 
 func (s *Server) FileList(ctx context.Context, in *fb.FileListRequest) (*fb.FileListReply, error) {
 	token := in.GetToken()
-	ip := getRemoteIP(ctx)
-	userToken := token + "-" + ip
-	timestamp, ok := session[userToken]
-	now := time.Now().Unix()
 
-	if ok && now-timestamp < int64(time.Minute)*5 {
-		// extend user sesion
-		session[userToken] = now
-
+	if verifyToken(ctx, token) {
 		// return the file list
 		return &fb.FileListReply{
 			Status: fb.ReplyStatus_Ok,
@@ -75,11 +67,11 @@ func (s *Server) FileList(ctx context.Context, in *fb.FileListRequest) (*fb.File
 		}, nil
 	}
 
-	// timeout or get the token from another ip
+	// token timeout or invalid token
 	return &fb.FileListReply{
 		Status: fb.ReplyStatus_Failed,
 		Data: &fb.FileListReply_Message{
-			Message: "Invalid token, please login first",
+			Message: tokenTimeoutMessage,
 		},
 	}, nil
 }
