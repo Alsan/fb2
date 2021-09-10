@@ -19,7 +19,7 @@ var cmdsLsCmd = &cobra.Command{
 	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
 		s, err := d.Store.Settings.Get()
 		c.CheckErr(err)
-		evt := mustGetString(cmd.Flags(), "event")
+		evt := c.MustGetString(cmd.Flags(), "event")
 
 		if evt == "" {
 			printEvents(s.Commands)

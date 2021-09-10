@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	u "github.com/alsan/filebrowser/client/utils"
 	c "github.com/alsan/filebrowser/common"
 	fb "github.com/alsan/filebrowser/proto"
 	"github.com/spf13/cobra"
@@ -18,8 +17,7 @@ func init() {
 }
 
 func getServer() string {
-	server, err := u.GetUserInput("Server (localhost:8080)")
-	c.CheckErr(err)
+	server := c.GetUserInput("Server (localhost:8080)")
 
 	if server == "" {
 		server = "localhost:8080"
@@ -28,17 +26,7 @@ func getServer() string {
 	return server
 }
 
-func getUsername() string {
-	username, err := u.GetUserInput("Username")
-	c.CheckErr(err)
-
-	return username
-}
-
-func getPassword() string {
-	password, err := u.GetUserPasswordInput()
-	c.CheckErr(err)
-
+func encryptPassword(password string) string {
 	m := c.Md5Pass(password)
 	h := hex.EncodeToString(m)
 	b := []byte(h)
@@ -69,10 +57,10 @@ var loginCmd = &cobra.Command{
 	Short: "Login into server",
 	Long:  `Login into filebrowser server`,
 	Args:  cobra.NoArgs,
-	Run: func(c *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, args []string) {
 		server := getServer()
-		username := getUsername()
-		password := getPassword()
+		username := c.GetUserInput("Username")
+		password := encryptPassword(c.GetUserPasswordInput())
 
 		reply := doLogin(server, username, password)
 

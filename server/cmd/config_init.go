@@ -32,26 +32,26 @@ override the options.`,
 
 		s := &settings.Settings{
 			Key:        generateKey(),
-			Signup:     mustGetBool(flags, "signup"),
-			Shell:      convertCmdStrToCmdArray(mustGetString(flags, "shell")),
+			Signup:     c.MustGetBool(flags, "signup"),
+			Shell:      convertCmdStrToCmdArray(c.MustGetString(flags, "shell")),
 			AuthMethod: authMethod,
 			Defaults:   defaults,
 			Branding: settings.Branding{
-				Name:            mustGetString(flags, "branding.name"),
-				DisableExternal: mustGetBool(flags, "branding.disableExternal"),
-				Files:           mustGetString(flags, "branding.files"),
+				Name:            c.MustGetString(flags, "branding.name"),
+				DisableExternal: c.MustGetBool(flags, "branding.disableExternal"),
+				Files:           c.MustGetString(flags, "branding.files"),
 			},
 		}
 
 		ser := &settings.Server{
-			Address: mustGetString(flags, "address"),
-			Socket:  mustGetString(flags, "socket"),
-			Root:    mustGetString(flags, "root"),
-			BaseURL: mustGetString(flags, "baseurl"),
-			TLSKey:  mustGetString(flags, "key"),
-			TLSCert: mustGetString(flags, "cert"),
-			Port:    mustGetString(flags, "port"),
-			Log:     mustGetString(flags, "log"),
+			Address: c.MustGetString(flags, "address"),
+			Socket:  c.MustGetString(flags, "socket"),
+			Root:    c.MustGetString(flags, "root"),
+			BaseURL: c.MustGetString(flags, "baseurl"),
+			TLSKey:  c.MustGetString(flags, "key"),
+			TLSCert: c.MustGetString(flags, "cert"),
+			Port:    c.MustGetString(flags, "port"),
+			Log:     c.MustGetString(flags, "log"),
 		}
 
 		err := d.Store.Settings.Save(s)

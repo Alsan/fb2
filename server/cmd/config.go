@@ -48,7 +48,7 @@ func addConfigFlags(flags *pflag.FlagSet) {
 
 //nolint:gocyclo
 func getAuthentication(flags *pflag.FlagSet, defaults ...interface{}) (settings.AuthMethod, auth.Auther) {
-	method := settings.AuthMethod(mustGetString(flags, "auth.method"))
+	method := settings.AuthMethod(c.MustGetString(flags, "auth.method"))
 
 	var defaultAuther map[string]interface{}
 	if len(defaults) > 0 {
@@ -69,7 +69,7 @@ func getAuthentication(flags *pflag.FlagSet, defaults ...interface{}) (settings.
 
 	var auther auth.Auther
 	if method == auth.MethodProxyAuth {
-		header := mustGetString(flags, "auth.header")
+		header := c.MustGetString(flags, "auth.header")
 
 		if header == "" {
 			header = defaultAuther["header"].(string)
@@ -88,9 +88,9 @@ func getAuthentication(flags *pflag.FlagSet, defaults ...interface{}) (settings.
 
 	if method == auth.MethodJSONAuth {
 		jsonAuth := &auth.JSONAuth{}
-		host := mustGetString(flags, "recaptcha.host")
-		key := mustGetString(flags, "recaptcha.key")
-		secret := mustGetString(flags, "recaptcha.secret")
+		host := c.MustGetString(flags, "recaptcha.host")
+		key := c.MustGetString(flags, "recaptcha.key")
+		secret := c.MustGetString(flags, "recaptcha.secret")
 
 		if key == "" {
 			if kmap, ok := defaultAuther["recaptcha"].(map[string]interface{}); ok {

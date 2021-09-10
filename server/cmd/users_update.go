@@ -28,8 +28,8 @@ options you want to change.`,
 	Run: h.Python(func(cmd *cobra.Command, args []string, d h.PythonData) {
 		username, id := parseUsernameOrID(args[0])
 		flags := cmd.Flags()
-		password := mustGetString(flags, "password")
-		newUsername := mustGetString(flags, "username")
+		password := c.MustGetString(flags, "password")
+		newUsername := c.MustGetString(flags, "username")
 
 		var (
 			err  error
@@ -61,7 +61,7 @@ options you want to change.`,
 		user.Perm = defaults.Perm
 		user.Commands = defaults.Commands
 		user.Sorting = defaults.Sorting
-		user.LockPassword = mustGetBool(flags, "lockPassword")
+		user.LockPassword = c.MustGetBool(flags, "lockPassword")
 
 		if newUsername != "" {
 			user.Username = newUsername

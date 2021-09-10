@@ -41,7 +41,7 @@ list or set it to 0.`,
 			c.CheckErr(err)
 		}
 
-		if mustGetBool(cmd.Flags(), "replace") {
+		if c.MustGetBool(cmd.Flags(), "replace") {
 			oldUsers, err := d.Store.Users.Gets("")
 			c.CheckErr(err)
 
@@ -54,7 +54,7 @@ list or set it to 0.`,
 			}
 		}
 
-		overwrite := mustGetBool(cmd.Flags(), "overwrite")
+		overwrite := c.MustGetBool(cmd.Flags(), "overwrite")
 
 		for _, user := range list {
 			onDB, err := d.Store.Users.Get("", user.ID)

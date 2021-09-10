@@ -25,8 +25,8 @@ this version.`,
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		flags := cmd.Flags()
-		oldDB := mustGetString(flags, "old.database")
-		oldConf := mustGetString(flags, "old.config")
+		oldDB := c.MustGetString(flags, "old.database")
+		oldConf := c.MustGetString(flags, "old.config")
 		err := importer.Import(oldDB, oldConf, h.GetParam(flags, "database"))
 		c.CheckErr(err)
 	},

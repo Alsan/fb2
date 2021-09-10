@@ -81,9 +81,9 @@ func addUserFlags(flags *pflag.FlagSet) {
 }
 
 func getViewMode(flags *pflag.FlagSet) users.ViewMode {
-	viewMode := users.ViewMode(mustGetString(flags, "viewMode"))
+	viewMode := users.ViewMode(c.MustGetString(flags, "viewMode"))
 	if viewMode != users.ListViewMode && viewMode != users.MosaicViewMode {
-		c.CheckErr(errors.New("view mode must be \"" + string(users.ListViewMode) + "\" or \"" + string(users.MosaicViewMode) + "\""))
+		c.CheckErr(errors.New("view mode c.Must be \"" + string(users.ListViewMode) + "\" or \"" + string(users.MosaicViewMode) + "\""))
 	}
 	return viewMode
 }
@@ -93,37 +93,37 @@ func getUserDefaults(flags *pflag.FlagSet, defaults *settings.UserDefaults, all 
 	visit := func(flag *pflag.Flag) {
 		switch flag.Name {
 		case "scope":
-			defaults.Scope = mustGetString(flags, flag.Name)
+			defaults.Scope = c.MustGetString(flags, flag.Name)
 		case "locale":
-			defaults.Locale = mustGetString(flags, flag.Name)
+			defaults.Locale = c.MustGetString(flags, flag.Name)
 		case "viewMode":
 			defaults.ViewMode = getViewMode(flags)
 		case "singleClick":
-			defaults.SingleClick = mustGetBool(flags, flag.Name)
+			defaults.SingleClick = c.MustGetBool(flags, flag.Name)
 		case "perm.admin":
-			defaults.Perm.Admin = mustGetBool(flags, flag.Name)
+			defaults.Perm.Admin = c.MustGetBool(flags, flag.Name)
 		case "perm.execute":
-			defaults.Perm.Execute = mustGetBool(flags, flag.Name)
+			defaults.Perm.Execute = c.MustGetBool(flags, flag.Name)
 		case "perm.create":
-			defaults.Perm.Create = mustGetBool(flags, flag.Name)
+			defaults.Perm.Create = c.MustGetBool(flags, flag.Name)
 		case "perm.rename":
-			defaults.Perm.Rename = mustGetBool(flags, flag.Name)
+			defaults.Perm.Rename = c.MustGetBool(flags, flag.Name)
 		case "perm.modify":
-			defaults.Perm.Modify = mustGetBool(flags, flag.Name)
+			defaults.Perm.Modify = c.MustGetBool(flags, flag.Name)
 		case "perm.delete":
-			defaults.Perm.Delete = mustGetBool(flags, flag.Name)
+			defaults.Perm.Delete = c.MustGetBool(flags, flag.Name)
 		case "perm.share":
-			defaults.Perm.Share = mustGetBool(flags, flag.Name)
+			defaults.Perm.Share = c.MustGetBool(flags, flag.Name)
 		case "perm.download":
-			defaults.Perm.Download = mustGetBool(flags, flag.Name)
+			defaults.Perm.Download = c.MustGetBool(flags, flag.Name)
 		case "commands":
 			commands, err := flags.GetStringSlice(flag.Name)
 			c.CheckErr(err)
 			defaults.Commands = commands
 		case "sorting.by":
-			defaults.Sorting.By = mustGetString(flags, flag.Name)
+			defaults.Sorting.By = c.MustGetString(flags, flag.Name)
 		case "sorting.asc":
-			defaults.Sorting.Asc = mustGetBool(flags, flag.Name)
+			defaults.Sorting.Asc = c.MustGetBool(flags, flag.Name)
 		}
 	}
 

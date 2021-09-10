@@ -41,7 +41,7 @@ var docsCmd = &cobra.Command{
 	Hidden: true,
 	Args:   cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		dir := mustGetString(cmd.Flags(), "path")
+		dir := c.MustGetString(cmd.Flags(), "path")
 		generateDocs(rootCmd, dir)
 		names := []string{}
 

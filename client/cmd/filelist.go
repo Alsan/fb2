@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	c "github.com/alsan/filebrowser/common"
@@ -12,15 +13,16 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(fileListCmd)
-}
+	cmd := fileListCmd
+	flags := cmd.Flags()
 
-func getOptionalArg(args []string, pos int, defaultValue string) string {
-	if len(args) > pos {
-		return args[pos]
-	}
-
-	return defaultValue
+	rootCmd.AddCommand(cmd)
+	flags.StringP("token", "t", "", "token to be used for authenticating the request")
+	flags.StringP("server", "s", "localhost:8080", "server address")
+	flags.StringP("username", "u", "", "login username")
+	flags.StringP("password", "p", "", "login password")
+	flags.StringP("path", "P", "/", "path to the list of files")
+	flags.StringP("filter", "f", "", "file extension to filter files")
 }
 
 func doGetFileList(token, server, path, filter string) *fb.FileListReply {
@@ -53,16 +55,38 @@ func doGetFileList(token, server, path, filter string) *fb.FileListReply {
 }
 
 var fileListCmd = &cobra.Command{
-	Use:   "filelist <token> [server] [path] [filter]",
+	Use:   "filelist",
 	Short: "Get a list of files from server",
 	Long:  `Get a list of files from server with optional path and filter`,
-	Args:  cobra.MinimumNArgs(1), //nolint:gomnd
-	Run: func(c *cobra.Command, args []string) {
-		token := args[0]
-		server := getOptionalArg(args, 1, "localhost:8080")
-		path := getOptionalArg(args, 2, "/")
-		filter := getOptionalArg(args, 3, "")
+	Args:  cobra.NoArgs,
+	Run: func(cmd *cobra.Command, args []string) {
+		var token, server string
 
+		flags := cmd.Flags()
+		server = c.MustGetString(flags, "server")
+		token = c.MustGetString(flags, "token")
+		if token == "" {
+			username := c.MustGetString(flags, "username")
+			if username == "" {
+				username = c.GetUserInput("username")
+			}
+			password := c.MustGetString(flags, "password")
+			if password == "" {
+				password = c.GetUserPasswordInput()
+			}
+
+			password = encryptPassword(password)
+
+			reply := doLogin(server, username, password)
+			if reply.GetStatus() == fb.ReplyStatus_Ok {
+				token = reply.GetToken()
+			} else {
+				log.Fatalf("Login failed, message: %s", reply.GetMessage())
+			}
+		}
+
+		path, _ := flags.GetString("path")
+		filter, _ := flags.GetString("filter")
 		reply := doGetFileList(token, server, path, filter)
 
 		if reply.GetStatus() == fb.ReplyStatus_Ok {

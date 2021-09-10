@@ -30,7 +30,7 @@ var usersAddCmd = &cobra.Command{
 		user := &users.User{
 			Username:     args[0],
 			Password:     password,
-			LockPassword: mustGetBool(cmd.Flags(), "lockPassword"),
+			LockPassword: c.MustGetBool(cmd.Flags(), "lockPassword"),
 		}
 
 		s.Defaults.Apply(user)

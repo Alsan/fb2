@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"context"
+	"log"
 	"time"
 
 	fb "github.com/alsan/filebrowser/proto"
@@ -43,4 +44,9 @@ func verifyToken(ctx context.Context, token string) bool {
 	}
 
 	return false
+}
+
+func logError(err error) error {
+	log.Print(err)
+	return err
 }

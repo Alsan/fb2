@@ -20,8 +20,8 @@ const _ = grpc.SupportPackageIsVersion7
 type FileBrowserRpcServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
 	FileList(ctx context.Context, in *FileListRequest, opts ...grpc.CallOption) (*FileListReply, error)
-	UploadFile(ctx context.Context, in *UploadFileRequest, opts ...grpc.CallOption) (*UploadFileReply, error)
-	DownloadFile(ctx context.Context, in *DownloadFileRequest, opts ...grpc.CallOption) (*DownloadFileReply, error)
+	UploadFile(ctx context.Context, opts ...grpc.CallOption) (FileBrowserRpcService_UploadFileClient, error)
+	DownloadFile(ctx context.Context, in *DownloadFileRequest, opts ...grpc.CallOption) (FileBrowserRpcService_DownloadFileClient, error)
 }
 
 type fileBrowserRpcServiceClient struct {
@@ -50,22 +50,70 @@ func (c *fileBrowserRpcServiceClient) FileList(ctx context.Context, in *FileList
 	return out, nil
 }
 
-func (c *fileBrowserRpcServiceClient) UploadFile(ctx context.Context, in *UploadFileRequest, opts ...grpc.CallOption) (*UploadFileReply, error) {
-	out := new(UploadFileReply)
-	err := c.cc.Invoke(ctx, "/FileBrowserRpcService/UploadFile", in, out, opts...)
+func (c *fileBrowserRpcServiceClient) UploadFile(ctx context.Context, opts ...grpc.CallOption) (FileBrowserRpcService_UploadFileClient, error) {
+	stream, err := c.cc.NewStream(ctx, &FileBrowserRpcService_ServiceDesc.Streams[0], "/FileBrowserRpcService/UploadFile", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &fileBrowserRpcServiceUploadFileClient{stream}
+	return x, nil
 }
 
-func (c *fileBrowserRpcServiceClient) DownloadFile(ctx context.Context, in *DownloadFileRequest, opts ...grpc.CallOption) (*DownloadFileReply, error) {
-	out := new(DownloadFileReply)
-	err := c.cc.Invoke(ctx, "/FileBrowserRpcService/DownloadFile", in, out, opts...)
+type FileBrowserRpcService_UploadFileClient interface {
+	Send(*UploadFileRequest) error
+	CloseAndRecv() (*UploadFileReply, error)
+	grpc.ClientStream
+}
+
+type fileBrowserRpcServiceUploadFileClient struct {
+	grpc.ClientStream
+}
+
+func (x *fileBrowserRpcServiceUploadFileClient) Send(m *UploadFileRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *fileBrowserRpcServiceUploadFileClient) CloseAndRecv() (*UploadFileReply, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(UploadFileReply)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *fileBrowserRpcServiceClient) DownloadFile(ctx context.Context, in *DownloadFileRequest, opts ...grpc.CallOption) (FileBrowserRpcService_DownloadFileClient, error) {
+	stream, err := c.cc.NewStream(ctx, &FileBrowserRpcService_ServiceDesc.Streams[1], "/FileBrowserRpcService/DownloadFile", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &fileBrowserRpcServiceDownloadFileClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type FileBrowserRpcService_DownloadFileClient interface {
+	Recv() (*DownloadFileReply, error)
+	grpc.ClientStream
+}
+
+type fileBrowserRpcServiceDownloadFileClient struct {
+	grpc.ClientStream
+}
+
+func (x *fileBrowserRpcServiceDownloadFileClient) Recv() (*DownloadFileReply, error) {
+	m := new(DownloadFileReply)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // FileBrowserRpcServiceServer is the server API for FileBrowserRpcService service.
@@ -74,8 +122,8 @@ func (c *fileBrowserRpcServiceClient) DownloadFile(ctx context.Context, in *Down
 type FileBrowserRpcServiceServer interface {
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
 	FileList(context.Context, *FileListRequest) (*FileListReply, error)
-	UploadFile(context.Context, *UploadFileRequest) (*UploadFileReply, error)
-	DownloadFile(context.Context, *DownloadFileRequest) (*DownloadFileReply, error)
+	UploadFile(FileBrowserRpcService_UploadFileServer) error
+	DownloadFile(*DownloadFileRequest, FileBrowserRpcService_DownloadFileServer) error
 	mustEmbedUnimplementedFileBrowserRpcServiceServer()
 }
 
@@ -89,11 +137,11 @@ func (UnimplementedFileBrowserRpcServiceServer) Login(context.Context, *LoginReq
 func (UnimplementedFileBrowserRpcServiceServer) FileList(context.Context, *FileListRequest) (*FileListReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FileList not implemented")
 }
-func (UnimplementedFileBrowserRpcServiceServer) UploadFile(context.Context, *UploadFileRequest) (*UploadFileReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
+func (UnimplementedFileBrowserRpcServiceServer) UploadFile(FileBrowserRpcService_UploadFileServer) error {
+	return status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
 }
-func (UnimplementedFileBrowserRpcServiceServer) DownloadFile(context.Context, *DownloadFileRequest) (*DownloadFileReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DownloadFile not implemented")
+func (UnimplementedFileBrowserRpcServiceServer) DownloadFile(*DownloadFileRequest, FileBrowserRpcService_DownloadFileServer) error {
+	return status.Errorf(codes.Unimplemented, "method DownloadFile not implemented")
 }
 func (UnimplementedFileBrowserRpcServiceServer) mustEmbedUnimplementedFileBrowserRpcServiceServer() {}
 
@@ -144,40 +192,51 @@ func _FileBrowserRpcService_FileList_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _FileBrowserRpcService_UploadFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UploadFileRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(FileBrowserRpcServiceServer).UploadFile(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/FileBrowserRpcService/UploadFile",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FileBrowserRpcServiceServer).UploadFile(ctx, req.(*UploadFileRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+func _FileBrowserRpcService_UploadFile_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(FileBrowserRpcServiceServer).UploadFile(&fileBrowserRpcServiceUploadFileServer{stream})
 }
 
-func _FileBrowserRpcService_DownloadFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DownloadFileRequest)
-	if err := dec(in); err != nil {
+type FileBrowserRpcService_UploadFileServer interface {
+	SendAndClose(*UploadFileReply) error
+	Recv() (*UploadFileRequest, error)
+	grpc.ServerStream
+}
+
+type fileBrowserRpcServiceUploadFileServer struct {
+	grpc.ServerStream
+}
+
+func (x *fileBrowserRpcServiceUploadFileServer) SendAndClose(m *UploadFileReply) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *fileBrowserRpcServiceUploadFileServer) Recv() (*UploadFileRequest, error) {
+	m := new(UploadFileRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
-	if interceptor == nil {
-		return srv.(FileBrowserRpcServiceServer).DownloadFile(ctx, in)
+	return m, nil
+}
+
+func _FileBrowserRpcService_DownloadFile_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(DownloadFileRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/FileBrowserRpcService/DownloadFile",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FileBrowserRpcServiceServer).DownloadFile(ctx, req.(*DownloadFileRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(FileBrowserRpcServiceServer).DownloadFile(m, &fileBrowserRpcServiceDownloadFileServer{stream})
+}
+
+type FileBrowserRpcService_DownloadFileServer interface {
+	Send(*DownloadFileReply) error
+	grpc.ServerStream
+}
+
+type fileBrowserRpcServiceDownloadFileServer struct {
+	grpc.ServerStream
+}
+
+func (x *fileBrowserRpcServiceDownloadFileServer) Send(m *DownloadFileReply) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 // FileBrowserRpcService_ServiceDesc is the grpc.ServiceDesc for FileBrowserRpcService service.
@@ -195,15 +254,18 @@ var FileBrowserRpcService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "FileList",
 			Handler:    _FileBrowserRpcService_FileList_Handler,
 		},
+	},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "UploadFile",
-			Handler:    _FileBrowserRpcService_UploadFile_Handler,
+			StreamName:    "UploadFile",
+			Handler:       _FileBrowserRpcService_UploadFile_Handler,
+			ClientStreams: true,
 		},
 		{
-			MethodName: "DownloadFile",
-			Handler:    _FileBrowserRpcService_DownloadFile_Handler,
+			StreamName:    "DownloadFile",
+			Handler:       _FileBrowserRpcService_DownloadFile_Handler,
+			ServerStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "filebrowser.proto",
 }

@@ -69,6 +69,7 @@ require (
 	github.com/spf13/cast v1.3.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/ulikunitz/xz v0.5.10 // indirect
+	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
 	google.golang.org/genproto v0.0.0-20200806141610-86f49bd18e98 // indirect
 	google.golang.org/grpc/examples v0.0.0-20210903175933-b2ba77a36ff8 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect

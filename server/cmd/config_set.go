@@ -30,33 +30,33 @@ you want to change. Other options will remain unchanged.`,
 		flags.Visit(func(flag *pflag.Flag) {
 			switch flag.Name {
 			case "baseurl":
-				ser.BaseURL = mustGetString(flags, flag.Name)
+				ser.BaseURL = c.MustGetString(flags, flag.Name)
 			case "root":
-				ser.Root = mustGetString(flags, flag.Name)
+				ser.Root = c.MustGetString(flags, flag.Name)
 			case "socket":
-				ser.Socket = mustGetString(flags, flag.Name)
+				ser.Socket = c.MustGetString(flags, flag.Name)
 			case "cert":
-				ser.TLSCert = mustGetString(flags, flag.Name)
+				ser.TLSCert = c.MustGetString(flags, flag.Name)
 			case "key":
-				ser.TLSKey = mustGetString(flags, flag.Name)
+				ser.TLSKey = c.MustGetString(flags, flag.Name)
 			case "address":
-				ser.Address = mustGetString(flags, flag.Name)
+				ser.Address = c.MustGetString(flags, flag.Name)
 			case "port":
-				ser.Port = mustGetString(flags, flag.Name)
+				ser.Port = c.MustGetString(flags, flag.Name)
 			case "log":
-				ser.Log = mustGetString(flags, flag.Name)
+				ser.Log = c.MustGetString(flags, flag.Name)
 			case "signup":
-				set.Signup = mustGetBool(flags, flag.Name)
+				set.Signup = c.MustGetBool(flags, flag.Name)
 			case "auth.method":
 				hasAuth = true
 			case "shell":
-				set.Shell = convertCmdStrToCmdArray(mustGetString(flags, flag.Name))
+				set.Shell = convertCmdStrToCmdArray(c.MustGetString(flags, flag.Name))
 			case "branding.name":
-				set.Branding.Name = mustGetString(flags, flag.Name)
+				set.Branding.Name = c.MustGetString(flags, flag.Name)
 			case "branding.disableExternal":
-				set.Branding.DisableExternal = mustGetBool(flags, flag.Name)
+				set.Branding.DisableExternal = c.MustGetBool(flags, flag.Name)
 			case "branding.files":
-				set.Branding.Files = mustGetString(flags, flag.Name)
+				set.Branding.Files = c.MustGetString(flags, flag.Name)
 			}
 		})
 

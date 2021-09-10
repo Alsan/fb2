@@ -11,27 +11,8 @@ import (
 	c "github.com/alsan/filebrowser/common"
 	"github.com/alsan/filebrowser/server/settings"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v2"
 )
-
-func mustGetString(flags *pflag.FlagSet, flag string) string {
-	s, err := flags.GetString(flag)
-	c.CheckErr(err)
-	return s
-}
-
-func mustGetBool(flags *pflag.FlagSet, flag string) bool {
-	b, err := flags.GetBool(flag)
-	c.CheckErr(err)
-	return b
-}
-
-func mustGetUint(flags *pflag.FlagSet, flag string) uint {
-	b, err := flags.GetUint(flag)
-	c.CheckErr(err)
-	return b
-}
 
 func generateKey() []byte {
 	k, err := settings.GenerateKey()
