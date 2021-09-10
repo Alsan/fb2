@@ -16,7 +16,7 @@ func init() {
 	rootCmd.AddCommand(loginCmd)
 }
 
-func getServer() string {
+func getUserServerInput() string {
 	server := c.GetUserInput("Server (localhost:8080)")
 
 	if server == "" {
@@ -58,7 +58,7 @@ var loginCmd = &cobra.Command{
 	Long:  `Login into filebrowser server`,
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		server := getServer()
+		server := getUserServerInput()
 		username := c.GetUserInput("Username")
 		password := encryptPassword(c.GetUserPasswordInput())
 

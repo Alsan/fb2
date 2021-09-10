@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	c "github.com/alsan/filebrowser/common"
@@ -17,10 +16,7 @@ func init() {
 	flags := cmd.Flags()
 
 	rootCmd.AddCommand(cmd)
-	flags.StringP("token", "t", "", "token to be used for authenticating the request")
-	flags.StringP("server", "s", "localhost:8080", "server address")
-	flags.StringP("username", "u", "", "login username")
-	flags.StringP("password", "p", "", "login password")
+	setCommonFlags(flags)
 	flags.StringP("path", "P", "/", "path to the list of files")
 	flags.StringP("filter", "f", "", "file extension to filter files")
 }
@@ -60,31 +56,9 @@ var fileListCmd = &cobra.Command{
 	Long:  `Get a list of files from server with optional path and filter`,
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		var token, server string
-
+		server := getServer(cmd)
+		token := getLoginToken(cmd, server)
 		flags := cmd.Flags()
-		server = c.MustGetString(flags, "server")
-		token = c.MustGetString(flags, "token")
-		if token == "" {
-			username := c.MustGetString(flags, "username")
-			if username == "" {
-				username = c.GetUserInput("username")
-			}
-			password := c.MustGetString(flags, "password")
-			if password == "" {
-				password = c.GetUserPasswordInput()
-			}
-
-			password = encryptPassword(password)
-
-			reply := doLogin(server, username, password)
-			if reply.GetStatus() == fb.ReplyStatus_Ok {
-				token = reply.GetToken()
-			} else {
-				log.Fatalf("Login failed, message: %s", reply.GetMessage())
-			}
-		}
-
 		path, _ := flags.GetString("path")
 		filter, _ := flags.GetString("filter")
 		reply := doGetFileList(token, server, path, filter)
