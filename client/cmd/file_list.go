@@ -19,31 +19,6 @@ type filelistClient struct {
 	filter  string
 }
 
-func newFilelistClient(conn *grpc.ClientConn, token, path, filter string) *filelistClient {
-	service := fb.NewFileBrowserRpcServiceClient(conn)
-	return &filelistClient{service, token, path, filter}
-}
-
-func (client *filelistClient) GetFileList() []string {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancel()
-
-	res, err := client.service.FileList(ctx, &fb.FileListRequest{
-		Token:  client.token,
-		Path:   client.path,
-		Filter: &client.filter,
-	})
-	if err != nil {
-		log.Fatalf("Unable to get file list: %v", err)
-	}
-
-	if res.Status != fb.ReplyStatus_Ok {
-		log.Fatalf("%s", res.GetMessage())
-	}
-
-	return res.GetList().Item
-}
-
 func init() {
 	cmd := fileListCmd
 	flags := cmd.Flags()
@@ -74,4 +49,29 @@ var fileListCmd = &cobra.Command{
 			fmt.Println(f)
 		}
 	},
+}
+
+func newFilelistClient(conn *grpc.ClientConn, token, path, filter string) *filelistClient {
+	service := fb.NewFileBrowserRpcServiceClient(conn)
+	return &filelistClient{service, token, path, filter}
+}
+
+func (client *filelistClient) GetFileList() []string {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	res, err := client.service.FileList(ctx, &fb.FileListRequest{
+		Token:  client.token,
+		Path:   client.path,
+		Filter: &client.filter,
+	})
+	if err != nil {
+		log.Fatalf("Unable to get file list: %v", err)
+	}
+
+	if res.Status != fb.ReplyStatus_Ok {
+		log.Fatalf("%s", res.GetMessage())
+	}
+
+	return res.GetList().Item
 }

@@ -20,6 +20,30 @@ type authClient struct {
 	password string
 }
 
+func init() {
+	rootCmd.AddCommand(loginCmd)
+}
+
+var loginCmd = &cobra.Command{
+	Use:   "login",
+	Short: "Login into server",
+	Long:  `Login into filebrowser server`,
+	Args:  cobra.NoArgs,
+	Run: func(cmd *cobra.Command, args []string) {
+		server := getUserServerInput()
+		username := c.GetUserInput("Username")
+		password := encryptPassword(c.GetUserPasswordInput())
+
+		msg, ok := doLogin(server, username, password)
+
+		if !ok {
+			log.Fatalf("Login failed: %s\n", msg)
+		}
+
+		fmt.Printf("Token: %s\n", msg)
+	},
+}
+
 // NewAuthClient returns a new auth client
 func newAuthClient(conn *grpc.ClientConn, username, password string) *authClient {
 	service := fb.NewFileBrowserRpcServiceClient(conn)
@@ -46,10 +70,6 @@ func (client *authClient) login() (bool, string, error) {
 	}
 
 	return false, res.GetMessage(), nil
-}
-
-func init() {
-	rootCmd.AddCommand(loginCmd)
 }
 
 func getUserServerInput() string {
@@ -80,24 +100,4 @@ func doLogin(server, username, password string) (string, bool) {
 	c.CheckErr(err)
 
 	return msg, success
-}
-
-var loginCmd = &cobra.Command{
-	Use:   "login",
-	Short: "Login into server",
-	Long:  `Login into filebrowser server`,
-	Args:  cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
-		server := getUserServerInput()
-		username := c.GetUserInput("Username")
-		password := encryptPassword(c.GetUserPasswordInput())
-
-		msg, ok := doLogin(server, username, password)
-
-		if !ok {
-			log.Fatalf("Login failed: %s\n", msg)
-		}
-
-		fmt.Printf("Token: %s\n", msg)
-	},
 }
