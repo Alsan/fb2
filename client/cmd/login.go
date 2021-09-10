@@ -1,13 +1,12 @@
 package cmd
 
 import (
-	"context"
 	"encoding/hex"
 	"fmt"
-	"time"
+	"log"
 
+	auth "github.com/alsan/filebrowser/client/client"
 	c "github.com/alsan/filebrowser/common"
-	fb "github.com/alsan/filebrowser/proto"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
@@ -34,22 +33,16 @@ func encryptPassword(password string) string {
 	return string(c.BcryptHash(b))
 }
 
-func doLogin(server string, username string, password string) *fb.LoginReply {
+func doLogin(server, username, password string) (string, bool) {
 	conn, err := grpc.Dial(server, grpc.WithInsecure(), grpc.WithBlock())
 	c.ExitIfError("Unable to connect to server, %v", err)
 	defer conn.Close()
-	client := fb.NewFileBrowserRpcServiceClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	reply, err := client.Login(ctx, &fb.LoginRequest{
-		Username: username,
-		Password: password,
-	})
+	client := auth.NewAuthClient(conn, username, password)
+	success, msg, err := client.Login()
 	c.CheckErr(err)
 
-	return reply
+	return msg, success
 }
 
 var loginCmd = &cobra.Command{
@@ -62,14 +55,12 @@ var loginCmd = &cobra.Command{
 		username := c.GetUserInput("Username")
 		password := encryptPassword(c.GetUserPasswordInput())
 
-		reply := doLogin(server, username, password)
+		msg, ok := doLogin(server, username, password)
 
-		if reply.GetStatus() == fb.ReplyStatus_Ok {
-			fmt.Printf("Login successful, Token: %s", reply.GetToken())
-		} else {
-			fmt.Printf("Login failed, message: %s", reply.GetMessage())
+		if !ok {
+			log.Fatalf("Login failed: %s\n", msg)
 		}
 
-		fmt.Println()
+		fmt.Printf("Token: %s\n", msg)
 	},
 }
