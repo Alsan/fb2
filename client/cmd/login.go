@@ -1,15 +1,52 @@
 package cmd
 
 import (
+	"context"
 	"encoding/hex"
 	"fmt"
 	"log"
+	"time"
 
-	auth "github.com/alsan/filebrowser/client/client"
 	c "github.com/alsan/filebrowser/common"
+	fb "github.com/alsan/filebrowser/proto"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
+
+// AuthClient is a client to call authentication RPC
+type authClient struct {
+	service  fb.FileBrowserRpcServiceClient
+	username string
+	password string
+}
+
+// NewAuthClient returns a new auth client
+func newAuthClient(conn *grpc.ClientConn, username, password string) *authClient {
+	service := fb.NewFileBrowserRpcServiceClient(conn)
+	return &authClient{service, username, password}
+}
+
+// Login login user and returns the access token
+func (client *authClient) login() (bool, string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	req := &fb.LoginRequest{
+		Username: client.username,
+		Password: client.password,
+	}
+
+	res, err := client.service.Login(ctx, req)
+	if err != nil {
+		return false, "", err
+	}
+
+	if res.GetStatus() == fb.ReplyStatus_Ok {
+		return true, res.GetToken(), nil
+	}
+
+	return false, res.GetMessage(), nil
+}
 
 func init() {
 	rootCmd.AddCommand(loginCmd)
@@ -38,8 +75,8 @@ func doLogin(server, username, password string) (string, bool) {
 	c.ExitIfError("Unable to connect to server, %v", err)
 	defer conn.Close()
 
-	client := auth.NewAuthClient(conn, username, password)
-	success, msg, err := client.Login()
+	client := newAuthClient(conn, username, password)
+	success, msg, err := client.login()
 	c.CheckErr(err)
 
 	return msg, success
