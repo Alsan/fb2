@@ -7,6 +7,8 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	c "github.com/alsan/filebrowser/common"
@@ -40,20 +42,31 @@ var uploadFileCmd = &cobra.Command{
 		server := getServer(cmd)
 		conn, err := grpc.Dial(server, grpc.WithInsecure(), grpc.WithBlock())
 		c.ExitIfError("Unable to connect to server, %v", err)
-		defer conn.Close()
+		// defer conn.Close()
 
 		token := getLoginToken(cmd, server)
 		flags := cmd.Flags()
 		path, _ := flags.GetString("path")
 		filename := args[0]
 
-		log.Printf("token: %s, path: %s filename: %s", token, path, filename)
+		if !strings.HasPrefix(filename, "//") {
+			filename, err = filepath.Abs("./" + filename)
+			c.ExitIfError("unable to find absolute path to file: %v", err)
+		}
+
+		if !c.IsFileExist(filename) {
+			c.ExitIfError("unable to get current working directory, %v", err)
+		}
+
+		// log.Printf("token: %s, path: %s, filename: %s", token, path, filename)
 		client := newUploadFileClient(conn, token, path, filename)
 		ok := client.uploadFile()
 		if !ok {
+			conn.Close()
 			log.Fatalf("error uploading file: %s\n", filename)
 		}
 
+		conn.Close()
 		log.Println("file upload complete")
 	},
 }
@@ -64,54 +77,52 @@ func newUploadFileClient(conn *grpc.ClientConn, token, path, filename string) *u
 }
 
 func (client *uploadFileClient) uploadFile() bool {
+	file, err := os.Open(client.filename)
+	c.ExitIfError("unable to open upload file, error: %v", err)
+	defer file.Close()
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	file, err := os.Open(client.filename)
-	c.CheckErr(err)
-	defer file.Close()
+	stream, err := client.service.UploadFile(ctx)
+	c.ExitIfError("unable to open upload stream, %v", err)
 
-	req := &fb.UploadFileRequest{
-		Token: client.token,
+	err = stream.Send(&fb.UploadFileRequest{
 		Data: &fb.UploadFileRequest_Metadata{
-			Metadata: &fb.FileInfo{
+			Metadata: &fb.MetaData{
+				Token:    client.token,
 				Path:     client.path,
 				Filename: client.filename,
 				Size:     c.GetFileSize(file),
 				Checksum: c.GetFileChecksum(file),
 			},
 		},
-	}
-
-	stream, err := client.service.UploadFile(ctx)
-	c.CheckErr(err)
-
-	err = stream.Send(req)
-	c.CheckErr(err)
+	})
+	c.ExitIfError("unable to send metadata, %v", err)
 
 	reader := bufio.NewReader(file)
 	buffer := make([]byte, 1024)
 
+	// reset file pointer to ensure file read begining
+	file.Seek(0, io.SeekStart)
+
 	for {
 		n, err := reader.Read(buffer)
-		c.CheckErr(err)
 		if err == io.EOF {
 			break
 		}
+		c.ExitIfError("unable to read chunk, %v", err)
 
-		req := &fb.UploadFileRequest{
-			Token: client.token,
+		err = stream.Send(&fb.UploadFileRequest{
 			Data: &fb.UploadFileRequest_Content{
 				Content: buffer[:n],
 			},
-		}
-
-		err = stream.Send(req)
-		c.CheckErr(err)
+		})
+		c.ExitIfError("unable to send chunk, %s", err)
 	}
 
 	res, err := stream.CloseAndRecv()
-	c.CheckErr(err)
+	c.ExitIfError("unable to receive response, %s", err)
 
 	if res.Status != fb.ReplyStatus_Ok {
 		panic(fmt.Sprintf("File upload failed, %s", res.GetMessage()))
