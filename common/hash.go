@@ -2,6 +2,9 @@ package common
 
 import (
 	"crypto/md5"
+	"encoding/hex"
+	"io"
+	"os"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
@@ -43,4 +46,12 @@ func BcryptHash(password []byte) []byte {
 	CheckErr(err)
 
 	return bytes
+}
+
+func GetFileChecksum(file *os.File) string {
+	hasher := md5.New()
+	_, err := io.Copy(hasher, file)
+	CheckErr(err)
+
+	return hex.EncodeToString(hasher.Sum(nil))
 }

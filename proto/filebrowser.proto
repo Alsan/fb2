@@ -41,17 +41,18 @@ message FileListReply {
   }
 }
 
-// upload file request and response
 message FileInfo {
   string path = 1;
   string filename = 2;
-  string size = 3;
+  int64 size = 3;
   string checksum = 4;
 }
 
+// upload file request and response
 message UploadFileRequest {
   string token = 1;
-  oneof request {
+
+  oneof data {
     FileInfo metadata = 2;
     bytes content = 3;
   }
