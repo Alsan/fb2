@@ -54,8 +54,7 @@ var uploadFileCmd = &cobra.Command{
 
 		// log.Printf("token: %s, path: %s, filename: %s", token, path, filename)
 		client := newUploadFileClient(conn, token, path, filename)
-		ok := client.uploadFile()
-		if !ok {
+		if ok := client.uploadFile(); !ok {
 			log.Fatalf("error uploading file: %s\n", filename)
 		}
 
