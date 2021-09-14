@@ -40,10 +40,12 @@ func (s *Server) UploadFile(stream fb.FileBrowserRpcService_UploadFileServer) er
 		writter := bufio.NewWriter(file)
 
 		for {
+			// check grpc context
 			if err := contextError(stream.Context()); err != nil {
 				return err
 			}
 
+			// begin receive stream
 			req, err := stream.Recv()
 			if err == io.EOF {
 				log.Print("no more data")
@@ -75,6 +77,7 @@ func (s *Server) UploadFile(stream fb.FileBrowserRpcService_UploadFileServer) er
 			return logError(status.Errorf(codes.Unknown, "file checksum mismatch: %s, declared: %s", checksum, declared))
 		}
 
+		// reply client everything is ok
 		if err = stream.SendAndClose(&fb.UploadFileReply{Status: fb.ReplyStatus_Ok}); err != nil {
 			return logError(status.Errorf(codes.Unknown, "cannot send response, %v", err))
 		}
