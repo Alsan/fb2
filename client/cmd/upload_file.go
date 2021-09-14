@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	c "github.com/alsan/filebrowser/common"
@@ -36,23 +35,18 @@ func init() {
 var uploadFileCmd = &cobra.Command{
 	Use:   "uploadfile <filename>",
 	Short: "Upload file to server",
-	Long:  `Upload file to server by specifing server, path and filename.`,
+	Long:  `Upload file to server by specifing server, path and full path to the file to be upload.`,
 	Args:  cobra.MinimumNArgs(1), //nolint:gomnd
 	Run: func(cmd *cobra.Command, args []string) {
 		server := getServer(cmd)
 		conn, err := grpc.Dial(server, grpc.WithInsecure(), grpc.WithBlock())
 		c.ExitIfError("Unable to connect to server, %v", err)
-		// defer conn.Close()
+		defer conn.Close()
 
 		token := getLoginToken(cmd, server)
 		flags := cmd.Flags()
 		path, _ := flags.GetString("path")
 		filename := args[0]
-
-		if !strings.HasPrefix(filename, "//") {
-			filename, err = filepath.Abs("./" + filename)
-			c.ExitIfError("unable to find absolute path to file: %v", err)
-		}
 
 		if !c.IsFileExist(filename) {
 			c.ExitIfError("unable to get current working directory, %v", err)
@@ -62,7 +56,6 @@ var uploadFileCmd = &cobra.Command{
 		client := newUploadFileClient(conn, token, path, filename)
 		ok := client.uploadFile()
 		if !ok {
-			conn.Close()
 			log.Fatalf("error uploading file: %s\n", filename)
 		}
 
@@ -87,18 +80,19 @@ func (client *uploadFileClient) uploadFile() bool {
 	stream, err := client.service.UploadFile(ctx)
 	c.ExitIfError("unable to open upload stream, %v", err)
 
-	err = stream.Send(&fb.UploadFileRequest{
+	if err = stream.Send(&fb.UploadFileRequest{
 		Data: &fb.UploadFileRequest_Metadata{
 			Metadata: &fb.MetaData{
 				Token:    client.token,
 				Path:     client.path,
-				Filename: client.filename,
+				Filename: filepath.Base(client.filename),
 				Size:     c.GetFileSize(file),
 				Checksum: c.GetFileChecksum(file),
 			},
 		},
-	})
-	c.ExitIfError("unable to send metadata, %v", err)
+	}); err != nil {
+		log.Fatalf("unable to send metadata, %v", err)
+	}
 
 	reader := bufio.NewReader(file)
 	buffer := make([]byte, 1024)
@@ -113,12 +107,13 @@ func (client *uploadFileClient) uploadFile() bool {
 		}
 		c.ExitIfError("unable to read chunk, %v", err)
 
-		err = stream.Send(&fb.UploadFileRequest{
+		if err = stream.Send(&fb.UploadFileRequest{
 			Data: &fb.UploadFileRequest_Content{
 				Content: buffer[:n],
 			},
-		})
-		c.ExitIfError("unable to send chunk, %s", err)
+		}); err != nil {
+			log.Fatalf("unable to send chunk, %s", err)
+		}
 	}
 
 	res, err := stream.CloseAndRecv()

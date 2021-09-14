@@ -37,7 +37,7 @@ $(BIN)/golangci-lint: PACKAGE=github.com/golangci/golangci-lint/cmd/golangci-lin
 GOIMPORTS = $(BIN)/goimports
 $(BIN)/goimports: PACKAGE=golang.org/x/tools/cmd/goimports@v0.1.5
 
-all: update clean build
+all: build run
 
 update:
 	go mod tidy
@@ -47,3 +47,6 @@ clean:
 
 build:
 	go build -ldflags '$(LDFLAGS)' -o $(BIN)/fb-cli
+
+run:
+	$(BIN)/fb-cli uploadfile go.mod
