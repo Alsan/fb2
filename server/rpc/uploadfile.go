@@ -1,10 +1,13 @@
 package rpc
 
 import (
-	"bytes"
+	"bufio"
 	"io"
 	"log"
+	"os"
+	"path/filepath"
 
+	c "github.com/alsan/filebrowser/common"
 	fb "github.com/alsan/filebrowser/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -18,8 +21,23 @@ func (s *Server) UploadFile(stream fb.FileBrowserRpcService_UploadFileServer) er
 
 	metaData := req.GetMetadata()
 	if verifyToken(stream.Context(), metaData.GetToken()) {
-		buffer := bytes.Buffer{}
-		bufSize := 0
+		filename := filepath.Join(serverConf.Root, metaData.GetPath(), metaData.GetFilename())
+		filepath := filepath.Dir(filename)
+
+		// ensure file path is exist
+		if err := os.MkdirAll(filepath, os.ModePerm); err != nil {
+			return logError(status.Errorf(codes.Internal, "error creating directory: %v", err))
+		}
+
+		// create file handler
+		file, err := os.Create(filename)
+		if err != nil {
+			return logError(status.Errorf(codes.Internal, "error creating file: %v", err))
+		}
+		defer file.Close()
+
+		// create buffered writter
+		writter := bufio.NewWriter(file)
 
 		for {
 			if err := contextError(stream.Context()); err != nil {
@@ -35,13 +53,26 @@ func (s *Server) UploadFile(stream fb.FileBrowserRpcService_UploadFileServer) er
 				return logError(status.Errorf(codes.Unknown, "cannot receive stream request: %v", err))
 			}
 
-			chunk := req.GetContent()
-			size := len(chunk)
-			bufSize += size
-
-			if _, err = buffer.Write(chunk); err != nil {
-				return logError(status.Errorf(codes.Unknown, "cannot write chunk data, %v", err))
+			// write received chunk into file buffer
+			if _, err := writter.Write(req.GetContent()); err != nil {
+				return logError(status.Errorf(codes.Internal, "error writting chunk: %v", err))
 			}
+		}
+
+		// flush file buffer
+		writter.Flush()
+
+		// validating written file size
+		written := c.GetFileSize(file)
+		if written != metaData.GetSize() {
+			return logError(status.Errorf(codes.Unknown, "written size mismatch: %d", writter.Available()))
+		}
+
+		// validating file checksum
+		checksum := c.GetFileChecksum(file)
+		declared := metaData.GetChecksum()
+		if checksum != declared {
+			return logError(status.Errorf(codes.Unknown, "file checksum mismatch: %s, declared: %s", checksum, declared))
 		}
 
 		if err = stream.SendAndClose(&fb.UploadFileReply{Status: fb.ReplyStatus_Ok}); err != nil {

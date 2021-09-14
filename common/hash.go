@@ -49,6 +49,9 @@ func BcryptHash(password []byte) []byte {
 }
 
 func GetFileChecksum(file *os.File) string {
+	// reset file pointer to begining of the file
+	file.Seek(0, io.SeekStart)
+
 	hasher := md5.New()
 	_, err := io.Copy(hasher, file)
 	CheckErr(err)
