@@ -27,7 +27,7 @@ func init() {
 	cmd := uploadFileCmd
 	flags := cmd.Flags()
 
-	rootCmd.AddCommand(uploadFileCmd)
+	rootCmd.AddCommand(cmd)
 	setCommonFlags(flags)
 	flags.StringP("path", "P", "/", "path to the list of files")
 }
@@ -36,7 +36,7 @@ var uploadFileCmd = &cobra.Command{
 	Use:   "uploadfile <filename>",
 	Short: "Upload file to server",
 	Long:  `Upload file to server by specifing server, path and full path to the file to be upload.`,
-	Args:  cobra.MinimumNArgs(1), //nolint:gomnd
+	Args:  cobra.ExactArgs(1), //nolint:gomnd
 	Run: func(cmd *cobra.Command, args []string) {
 		// prepare arguments for rpc call
 		server := getServer(cmd)
@@ -60,7 +60,6 @@ var uploadFileCmd = &cobra.Command{
 			log.Fatalf("error uploading file: %s\n", filename)
 		}
 
-		conn.Close()
 		log.Println("file upload complete")
 	},
 }
@@ -84,6 +83,8 @@ func (client *uploadFileClient) uploadFile() bool {
 	stream, err := client.service.UploadFile(ctx)
 	c.ExitIfError("unable to open upload stream, %v", err)
 
+	fileSize := c.GetFileSize(file)
+
 	// send meta data
 	if err = stream.Send(&fb.UploadFileRequest{
 		Data: &fb.UploadFileRequest_Metadata{
@@ -91,7 +92,7 @@ func (client *uploadFileClient) uploadFile() bool {
 				Token:    client.token,
 				Path:     client.path,
 				Filename: filepath.Base(client.filename),
-				Size:     c.GetFileSize(file),
+				Size:     fileSize,
 				Checksum: c.GetFileChecksum(file),
 			},
 		},
@@ -101,7 +102,7 @@ func (client *uploadFileClient) uploadFile() bool {
 
 	// create reader
 	reader := bufio.NewReader(file)
-	buffer := make([]byte, 1024)
+	buffer := make([]byte, c.GetBufferSize(fileSize))
 
 	// reset file pointer to ensure file read begining
 	file.Seek(0, io.SeekStart)
