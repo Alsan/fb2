@@ -46,7 +46,7 @@ clean:
 	rm $(BIN)/*
 
 build:
-	go build -ldflags '$(LDFLAGS)' -o $(BIN)/fb-cli
+	go build -ldflags '$(LDFLAGS)' -o $(BIN)/fb2cli
 
 run:
-	$(BIN)/fb-cli downloadfile test.txt
+	$(BIN)/fb2cli downloadfile test.txt

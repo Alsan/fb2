@@ -7,7 +7,7 @@ build:
   env:
     - CGO_ENABLED=0
   ldflags:
-    - -s -w -X github.com/alsan/filebrowser/v2/version.Version={{ .Version }} -X github.com/alsan/filebrowser/v2/version.CommitSHA={{ .ShortCommit }}
+    - -s -w -X github.com/alsan/fb2/v2/version.Version={{ .Version }} -X github.com/alsan/fb2/v2/version.CommitSHA={{ .ShortCommit }}
   main: main.go
   binary: filebrowser
   goos:

@@ -11,10 +11,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	c "github.com/alsan/filebrowser/common"
-	"github.com/alsan/filebrowser/server/auth"
-	"github.com/alsan/filebrowser/server/errors"
-	"github.com/alsan/filebrowser/server/settings"
+	c "github.com/alsan/fb2/common"
+	"github.com/alsan/fb2/server/auth"
+	"github.com/alsan/fb2/server/errors"
+	"github.com/alsan/fb2/server/settings"
 )
 
 func init() {

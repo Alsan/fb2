@@ -12,7 +12,7 @@ const notyDefault = {
   type: "info",
   layout: "bottomRight",
   timeout: 1000,
-  progressBar: true,
+  progressBar: true
 };
 
 Vue.prototype.$noty = (opts) => {
@@ -23,7 +23,7 @@ Vue.prototype.$showSuccess = (message) => {
   new Noty(
     Object.assign({}, notyDefault, {
       text: message,
-      type: "success",
+      type: "success"
     })
   ).show();
 };
@@ -32,15 +32,13 @@ Vue.prototype.$showError = (error, displayReport = true) => {
   let btns = [
     Noty.button(i18n.t("buttons.close"), "", function () {
       n.close();
-    }),
+    })
   ];
 
   if (!disableExternal && displayReport) {
     btns.unshift(
       Noty.button(i18n.t("buttons.reportIssue"), "", function () {
-        window.open(
-          "https://github.com/alsan/filebrowser/issues/new/choose"
-        );
+        window.open("https://github.com/alsan/fb2/issues/new/choose");
       })
     );
   }
@@ -50,7 +48,7 @@ Vue.prototype.$showError = (error, displayReport = true) => {
       text: error.message || error,
       type: "error",
       timeout: null,
-      buttons: btns,
+      buttons: btns
     })
   );
 
@@ -60,7 +58,7 @@ Vue.prototype.$showError = (error, displayReport = true) => {
 Vue.directive("focus", {
   inserted: function (el) {
     el.focus();
-  },
+  }
 });
 
 export default Vue;

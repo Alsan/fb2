@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	c "github.com/alsan/filebrowser/common"
-	"github.com/alsan/filebrowser/server/settings"
+	c "github.com/alsan/fb2/common"
+	"github.com/alsan/fb2/server/settings"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )

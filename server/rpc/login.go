@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	fb "github.com/alsan/filebrowser/proto"
-	u "github.com/alsan/filebrowser/server/users"
+	fb "github.com/alsan/fb2/proto"
+	u "github.com/alsan/fb2/server/users"
 	"google.golang.org/grpc/peer"
 )
 

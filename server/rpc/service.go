@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	fb "github.com/alsan/filebrowser/proto"
-	h "github.com/alsan/filebrowser/server/helpers"
-	"github.com/alsan/filebrowser/server/settings"
+	fb "github.com/alsan/fb2/proto"
+	h "github.com/alsan/fb2/server/helpers"
+	"github.com/alsan/fb2/server/settings"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

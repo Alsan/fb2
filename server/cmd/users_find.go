@@ -3,9 +3,9 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	c "github.com/alsan/filebrowser/common"
-	h "github.com/alsan/filebrowser/server/helpers"
-	"github.com/alsan/filebrowser/server/users"
+	c "github.com/alsan/fb2/common"
+	h "github.com/alsan/fb2/server/helpers"
+	"github.com/alsan/fb2/server/users"
 )
 
 func init() {

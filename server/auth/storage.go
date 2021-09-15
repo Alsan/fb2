@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"github.com/alsan/filebrowser/server/settings"
-	"github.com/alsan/filebrowser/server/users"
+	"github.com/alsan/fb2/server/settings"
+	"github.com/alsan/fb2/server/users"
 )
 
 // StorageBackend is a storage backend for auth storage.

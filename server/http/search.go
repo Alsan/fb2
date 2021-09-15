@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/alsan/filebrowser/server/search"
+	"github.com/alsan/fb2/server/search"
 )
 
 var searchHandler = withUser(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {

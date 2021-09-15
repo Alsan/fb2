@@ -3,7 +3,7 @@ package main
 import (
 	"runtime"
 
-	"github.com/alsan/filebrowser/server/cmd"
+	"github.com/alsan/fb2/server/cmd"
 )
 
 func main() {

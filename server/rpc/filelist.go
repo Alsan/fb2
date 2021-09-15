@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	c "github.com/alsan/filebrowser/common"
-	fb "github.com/alsan/filebrowser/proto"
+	c "github.com/alsan/fb2/common"
+	fb "github.com/alsan/fb2/proto"
 )
 
 func getFilesWithoutFilter(path string) []string {

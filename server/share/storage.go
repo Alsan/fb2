@@ -3,7 +3,7 @@ package share
 import (
 	"time"
 
-	"github.com/alsan/filebrowser/server/errors"
+	"github.com/alsan/fb2/server/errors"
 )
 
 // StorageBackend is the interface to implement for a share storage.

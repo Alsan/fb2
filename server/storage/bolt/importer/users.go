@@ -7,9 +7,9 @@ import (
 	"github.com/asdine/storm"
 	bolt "go.etcd.io/bbolt"
 
-	"github.com/alsan/filebrowser/server/rules"
-	"github.com/alsan/filebrowser/server/storage"
-	"github.com/alsan/filebrowser/server/users"
+	"github.com/alsan/fb2/server/rules"
+	"github.com/alsan/fb2/server/storage"
+	"github.com/alsan/fb2/server/users"
 )
 
 type oldUser struct {

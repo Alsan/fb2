@@ -1,10 +1,10 @@
-module github.com/alsan/filebrowser/client
+module github.com/alsan/fb2/client
 
 go 1.17
 
 require (
-	github.com/alsan/filebrowser/common v0.0.0
-	github.com/alsan/filebrowser/proto v0.0.0
+	github.com/alsan/fb2/common v0.0.0
+	github.com/alsan/fb2/proto v0.0.0
 )
 
 require (
@@ -28,6 +28,6 @@ require (
 	google.golang.org/protobuf v1.27.1 // indirect
 )
 
-replace github.com/alsan/filebrowser/proto v0.0.0 => ../proto
+replace github.com/alsan/fb2/proto v0.0.0 => ../proto
 
-replace github.com/alsan/filebrowser/common v0.0.0 => ../common
+replace github.com/alsan/fb2/common v0.0.0 => ../common

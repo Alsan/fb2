@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	c "github.com/alsan/filebrowser/common"
+	c "github.com/alsan/fb2/common"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )

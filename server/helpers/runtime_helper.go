@@ -10,9 +10,9 @@ import (
 	"github.com/spf13/pflag"
 	v "github.com/spf13/viper"
 
-	c "github.com/alsan/filebrowser/common"
-	"github.com/alsan/filebrowser/server/storage"
-	"github.com/alsan/filebrowser/server/storage/bolt"
+	c "github.com/alsan/fb2/common"
+	"github.com/alsan/fb2/server/storage"
+	"github.com/alsan/fb2/server/storage/bolt"
 )
 
 func GetParam(flags *pflag.FlagSet, key string) string {

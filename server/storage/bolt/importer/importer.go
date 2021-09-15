@@ -3,7 +3,7 @@ package importer
 import (
 	"github.com/asdine/storm"
 
-	"github.com/alsan/filebrowser/server/storage/bolt"
+	"github.com/alsan/fb2/server/storage/bolt"
 )
 
 // Import imports an old configuration to a newer database.

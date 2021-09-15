@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/alsan/filebrowser/client/rpc"
-	c "github.com/alsan/filebrowser/common"
+	"github.com/alsan/fb2/client/rpc"
+	c "github.com/alsan/fb2/common"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )

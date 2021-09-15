@@ -12,10 +12,10 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/alsan/filebrowser/server/auth"
-	"github.com/alsan/filebrowser/server/settings"
-	"github.com/alsan/filebrowser/server/storage"
-	"github.com/alsan/filebrowser/server/version"
+	"github.com/alsan/fb2/server/auth"
+	"github.com/alsan/fb2/server/settings"
+	"github.com/alsan/fb2/server/storage"
+	"github.com/alsan/fb2/server/version"
 )
 
 func handleWithStaticData(w http.ResponseWriter, _ *http.Request, d *data, fSys fs.FS, file, contentType string) (int, error) {

@@ -1,8 +1,8 @@
 package settings
 
 import (
-	"github.com/alsan/filebrowser/server/files"
-	"github.com/alsan/filebrowser/server/users"
+	"github.com/alsan/fb2/server/files"
+	"github.com/alsan/fb2/server/users"
 )
 
 // UserDefaults is a type that holds the default values

@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"time"
 
-	c "github.com/alsan/filebrowser/common"
-	fb "github.com/alsan/filebrowser/proto"
+	c "github.com/alsan/fb2/common"
+	fb "github.com/alsan/fb2/proto"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )

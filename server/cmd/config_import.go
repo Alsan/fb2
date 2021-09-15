@@ -8,10 +8,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	c "github.com/alsan/filebrowser/common"
-	"github.com/alsan/filebrowser/server/auth"
-	h "github.com/alsan/filebrowser/server/helpers"
-	"github.com/alsan/filebrowser/server/settings"
+	c "github.com/alsan/fb2/common"
+	"github.com/alsan/fb2/server/auth"
+	h "github.com/alsan/fb2/server/helpers"
+	"github.com/alsan/fb2/server/settings"
 )
 
 func init() {

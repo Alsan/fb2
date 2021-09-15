@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/alsan/filebrowser/server/proto";
+option go_package = "github.com/alsan/fb2/server/proto";
 
 // reusable messages
 enum ReplyStatus {

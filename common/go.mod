@@ -1,4 +1,4 @@
-module github.com/alsan/filebrowser/common
+module github.com/alsan/fb2/common
 
 go 1.17
 

@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	c "github.com/alsan/filebrowser/common"
-	fb "github.com/alsan/filebrowser/proto"
+	c "github.com/alsan/fb2/common"
+	fb "github.com/alsan/fb2/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

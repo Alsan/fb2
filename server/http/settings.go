@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/alsan/filebrowser/server/rules"
-	"github.com/alsan/filebrowser/server/settings"
+	"github.com/alsan/fb2/server/rules"
+	"github.com/alsan/fb2/server/settings"
 )
 
 type settingsData struct {

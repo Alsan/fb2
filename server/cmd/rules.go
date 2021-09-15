@@ -6,11 +6,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	c "github.com/alsan/filebrowser/common"
-	"github.com/alsan/filebrowser/server/rules"
-	"github.com/alsan/filebrowser/server/settings"
-	"github.com/alsan/filebrowser/server/storage"
-	"github.com/alsan/filebrowser/server/users"
+	c "github.com/alsan/fb2/common"
+	"github.com/alsan/fb2/server/rules"
+	"github.com/alsan/fb2/server/settings"
+	"github.com/alsan/fb2/server/storage"
+	"github.com/alsan/fb2/server/users"
 )
 
 func init() {

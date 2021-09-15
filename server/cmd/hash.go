@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	c "github.com/alsan/filebrowser/common"
+	c "github.com/alsan/fb2/common"
 )
 
 func init() {

@@ -13,9 +13,9 @@ import (
 
 	"github.com/spf13/afero"
 
-	"github.com/alsan/filebrowser/server/errors"
-	"github.com/alsan/filebrowser/server/files"
-	"github.com/alsan/filebrowser/server/fileutils"
+	"github.com/alsan/fb2/server/errors"
+	"github.com/alsan/fb2/server/files"
+	"github.com/alsan/fb2/server/fileutils"
 )
 
 var resourceGetHandler = withUser(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {

@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	fb "github.com/alsan/filebrowser/proto"
+	fb "github.com/alsan/fb2/proto"
 	"google.golang.org/grpc"
 )
 

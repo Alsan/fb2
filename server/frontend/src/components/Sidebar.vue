@@ -87,7 +87,7 @@
           v-else
           rel="noopener noreferrer"
           target="_blank"
-          href="https://github.com/alsan/filebrowser"
+          href="https://github.com/alsan/fb2"
           >File Browser</a
         >
         <span> {{ version }}</span>

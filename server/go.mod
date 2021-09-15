@@ -1,12 +1,12 @@
-module github.com/alsan/filebrowser/server
+module github.com/alsan/fb2/server
 
 go 1.17
 
 require (
 	github.com/DataDog/zstd v1.4.8 // indirect
 	github.com/Sereal/Sereal v0.0.0-20210713121911-8c71d8dbe594 // indirect
-	github.com/alsan/filebrowser/common v0.0.0
-	github.com/alsan/filebrowser/proto v0.0.0
+	github.com/alsan/fb2/common v0.0.0
+	github.com/alsan/fb2/proto v0.0.0
 	github.com/asdine/storm v2.1.2+incompatible
 	github.com/caddyserver/caddy v1.0.3
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -78,6 +78,6 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
 
-replace github.com/alsan/filebrowser/proto v0.0.0 => ../proto
+replace github.com/alsan/fb2/proto v0.0.0 => ../proto
 
-replace github.com/alsan/filebrowser/common v0.0.0 => ../common
+replace github.com/alsan/fb2/common v0.0.0 => ../common

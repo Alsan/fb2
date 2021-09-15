@@ -61,12 +61,12 @@ build-frontend: | ; $(info $(M) building frontend…)
 ## build-backend: Build backend
 .PHONY: build-backend
 build-backend: | ; $(info $(M) building backend…)
-	$Q $(GO) build -ldflags '$(LDFLAGS)' -o $(BIN)/filebrowser
+	$Q $(GO) build -ldflags '$(LDFLAGS)' -o $(BIN)/fb2
 
 ## run: Run the application with default configuration
 .PHONY: run
 run:
-	$Q $(BIN)/filebrowser
+	$Q $(BIN)/fb2
 
 ## test: Run all tests
 .PHONY: test

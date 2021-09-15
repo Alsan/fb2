@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/alsan/filebrowser/server/errors"
-	"github.com/alsan/filebrowser/server/settings"
-	"github.com/alsan/filebrowser/server/users"
+	"github.com/alsan/fb2/server/errors"
+	"github.com/alsan/fb2/server/settings"
+	"github.com/alsan/fb2/server/users"
 )
 
 // MethodProxyAuth is used to identify no auth.

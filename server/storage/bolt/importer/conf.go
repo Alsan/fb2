@@ -11,10 +11,10 @@ import (
 	toml "github.com/pelletier/go-toml"
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/alsan/filebrowser/server/auth"
-	"github.com/alsan/filebrowser/server/settings"
-	"github.com/alsan/filebrowser/server/storage"
-	"github.com/alsan/filebrowser/server/users"
+	"github.com/alsan/fb2/server/auth"
+	"github.com/alsan/fb2/server/settings"
+	"github.com/alsan/fb2/server/storage"
+	"github.com/alsan/fb2/server/users"
 )
 
 type oldDefs struct {

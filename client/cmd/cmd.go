@@ -1,6 +1,6 @@
 package cmd
 
-import c "github.com/alsan/filebrowser/common"
+import c "github.com/alsan/fb2/common"
 
 func Execute() {
 	err := rootCmd.Execute()

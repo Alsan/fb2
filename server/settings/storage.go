@@ -1,9 +1,9 @@
 package settings
 
 import (
-	"github.com/alsan/filebrowser/server/errors"
-	"github.com/alsan/filebrowser/server/rules"
-	"github.com/alsan/filebrowser/server/users"
+	"github.com/alsan/fb2/server/errors"
+	"github.com/alsan/fb2/server/rules"
+	"github.com/alsan/fb2/server/users"
 )
 
 // StorageBackend is a settings storage backend.

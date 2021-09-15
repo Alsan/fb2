@@ -1,10 +1,10 @@
 package storage
 
 import (
-	"github.com/alsan/filebrowser/server/auth"
-	"github.com/alsan/filebrowser/server/settings"
-	"github.com/alsan/filebrowser/server/share"
-	"github.com/alsan/filebrowser/server/users"
+	"github.com/alsan/fb2/server/auth"
+	"github.com/alsan/fb2/server/settings"
+	"github.com/alsan/fb2/server/share"
+	"github.com/alsan/fb2/server/users"
 )
 
 // Storage is a storage powered by a Backend which makes the necessary
