@@ -65,15 +65,27 @@ message UploadFileReply {
 // download file request and response
 message DownloadFileRequest {
   string token = 1;
-  string path = 2;
+  string filename = 2;
+}
+message DownloadFileInfo {
+  string filename = 1;
+  int64 size = 2;
+  string checksum = 3;
+}
+
+message DownloadFileData {
+  oneof option {
+    DownloadFileInfo info = 1;
+    bytes content = 2;
+  }
 }
 
 message DownloadFileReply {
   ReplyStatus status = 1;
 
-  oneof data {
+  oneof reply {
     string message = 2;
-    bytes content = 3;
+    DownloadFileData data = 3;
   }
 }
 

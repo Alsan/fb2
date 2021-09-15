@@ -49,4 +49,4 @@ build:
 	go build -ldflags '$(LDFLAGS)' -o $(BIN)/fb-cli
 
 run:
-	$(BIN)/fb-cli uploadfile go.mod
+	$(BIN)/fb-cli downloadfile test.txt

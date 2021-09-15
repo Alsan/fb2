@@ -16,3 +16,23 @@ func IsFileExist(filename string) bool {
 
 	return false
 }
+
+func GetBufferSize(fileSize int64) int {
+	if fileSize < 1024 {
+		return 1024
+	}
+
+	if fileSize < 1024*8 {
+		return 8192
+	}
+
+	if fileSize < 1024*64 {
+		return 1024 * 64
+	}
+
+	if fileSize < 1024*1024 {
+		return 1024 * 1024
+	}
+
+	return 1024 * 1024 * 2
+}
