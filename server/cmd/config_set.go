@@ -53,6 +53,8 @@ you want to change. Other options will remain unchanged.`,
 				set.Shell = convertCmdStrToCmdArray(c.MustGetString(flags, flag.Name))
 			case "branding.name":
 				set.Branding.Name = c.MustGetString(flags, flag.Name)
+			case "branding.color":
+				setBranding.Color = c.MustGetString(flags, flag.Name)
 			case "branding.disableExternal":
 				set.Branding.DisableExternal = c.MustGetBool(flags, flag.Name)
 			case "branding.files":
